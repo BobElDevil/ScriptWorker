@@ -177,31 +177,11 @@ public struct ScriptWorker {
 
     // MARK: Tasks
 
-    // Launch the task and return the status. Configure block for configuring stdout/stderr
-    private func launchTask(command: String, arguments: [String] = [], configure: (NSTask -> Void)) -> Int {
-        let task = NSTask()
-        if isDirectory {
-            task.currentDirectoryPath = path
-        } else {
-            task.currentDirectoryPath = url.URLByDeletingLastPathComponent!.path!
-        }
-
-        task.launchPath = "/usr/bin/env" // Use env so we can rely on items in $PATH
-        task.arguments = [command] + arguments
-
-        configure(task)
-
-        task.launch()
-        task.waitUntilExit()
-        return Int(task.terminationStatus)
-    }
-
-    // Launches the given task with the working directory set to path (or the parent directory if path is a file), returning a tuple with status, stdout and stderr
-    func launchTaskForOutput(command: String, arguments: [String] = []) -> (Int, String, String) {
-
+    /// Launches the given command with the working directory set to path (or the parent directory if path is a file), returning a tuple with status, stdout and stderr
+    public func launchCommandForOutput(command: String, arguments: [String] = []) -> (Int, String, String) {
         var outString: String = ""
         var errString: String = ""
-        let status = launchTask(command, arguments: arguments, configure:  { task in
+        let status = launchCommand(command, arguments: arguments, configure:  { task in
             // Sets up stderr or stdout for reading, and returns a block that should be called once
             // the task is complete
             func setupPipe(forStdout forStdout: Bool) -> (Void -> String) {
@@ -235,22 +215,44 @@ public struct ScriptWorker {
         return (status, outString, errString)
     }
 
-    // Runs given task, printing stdout & stderr
-    func launchTask(command: String, arguments: [String] = []) -> Int {
-        return launchTask(command, arguments: arguments, configure: { task in
+    /// Launches the given command with the working directory set to path (or the parent directory if path is a file), returning the status.
+    /// Stdout and Stderr are directed to the current programs Stdout and Stderr
+    public func launchCommand(command: String, arguments: [String] = []) -> Int {
+        return launchCommand(command, arguments: arguments, configure: { task in
             task.standardOutput = NSFileHandle.fileHandleWithStandardOutput()
             task.standardError = NSFileHandle.fileHandleWithStandardError()
         })
     }
 
+    // Launch the task and return the status. Configure block for configuring stdout/stderr
+    private func launchCommand(command: String, arguments: [String] = [], configure: (NSTask -> Void)) -> Int {
+        let task = NSTask()
+        if isDirectory {
+            task.currentDirectoryPath = path
+        } else {
+            task.currentDirectoryPath = url.URLByDeletingLastPathComponent!.path!
+        }
+
+        task.launchPath = "/usr/bin/env" // Use env so we can rely on items in $PATH
+        task.arguments = [command] + arguments
+
+        configure(task)
+
+        task.launch()
+        task.waitUntilExit()
+        return Int(task.terminationStatus)
+    }
+    
+
+
 }
 
-@noreturn func exitMsg(msg: String) {
+@noreturn private func exitMsg(msg: String) {
     print(msg)
     exit(1)
 }
 
-@noreturn func exitError(error: ErrorType) {
+@noreturn private func exitError(error: ErrorType) {
     let nsErr = error as NSError
     var msg = nsErr.localizedDescription
     if let reason = nsErr.localizedFailureReason {
@@ -259,7 +261,7 @@ public struct ScriptWorker {
     exitMsg(msg)
 }
 
-func exitOnError(@noescape action: (Void throws -> Void)) {
+private func exitOnError(@noescape action: (Void throws -> Void)) {
     do {
         try action()
     } catch let error {
