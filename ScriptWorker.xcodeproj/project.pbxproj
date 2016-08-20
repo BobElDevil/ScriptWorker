@@ -10,6 +10,7 @@
 		AA514C9C1D6900BE00D563F2 /* ScriptWorker.h in Headers */ = {isa = PBXBuildFile; fileRef = AA514C9B1D6900BE00D563F2 /* ScriptWorker.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA514CA31D6900BE00D563F2 /* ScriptWorker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA514C981D6900BE00D563F2 /* ScriptWorker.framework */; };
 		AA514CA81D6900BE00D563F2 /* ScriptWorkerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA514CA71D6900BE00D563F2 /* ScriptWorkerTests.swift */; };
+		AA514CB31D69012900D563F2 /* ScriptWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA514CB21D69012900D563F2 /* ScriptWorker.swift */; };
 		AA514CBB1D69027400D563F2 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA514CBA1D69027400D563F2 /* main.swift */; };
 /* End PBXBuildFile section */
 
@@ -42,6 +43,7 @@
 		AA514CA21D6900BE00D563F2 /* ScriptWorkerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScriptWorkerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA514CA71D6900BE00D563F2 /* ScriptWorkerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptWorkerTests.swift; sourceTree = "<group>"; };
 		AA514CA91D6900BE00D563F2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA514CB21D69012900D563F2 /* ScriptWorker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScriptWorker.swift; sourceTree = "<group>"; };
 		AA514CB81D69027400D563F2 /* ScriptWorkerSample */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ScriptWorkerSample; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA514CBA1D69027400D563F2 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -97,6 +99,7 @@
 			children = (
 				AA514C9B1D6900BE00D563F2 /* ScriptWorker.h */,
 				AA514C9D1D6900BE00D563F2 /* Info.plist */,
+				AA514CB21D69012900D563F2 /* ScriptWorker.swift */,
 			);
 			path = ScriptWorker;
 			sourceTree = "<group>";
@@ -247,6 +250,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA514CB31D69012900D563F2 /* ScriptWorker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
