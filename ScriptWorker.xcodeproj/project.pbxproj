@@ -22,6 +22,13 @@
 			remoteGlobalIDString = AA514C971D6900BE00D563F2;
 			remoteInfo = ScriptWorker;
 		};
+		AA514CC11D69203600D563F2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA514C8F1D6900BE00D563F2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA514C971D6900BE00D563F2;
+			remoteInfo = ScriptWorker;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -182,6 +189,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				AA514CC21D69203600D563F2 /* PBXTargetDependency */,
 			);
 			name = ScriptWorkerSample;
 			productName = ScriptWorkerSample;
@@ -277,6 +285,11 @@
 			isa = PBXTargetDependency;
 			target = AA514C971D6900BE00D563F2 /* ScriptWorker */;
 			targetProxy = AA514CA41D6900BE00D563F2 /* PBXContainerItemProxy */;
+		};
+		AA514CC21D69203600D563F2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA514C971D6900BE00D563F2 /* ScriptWorker */;
+			targetProxy = AA514CC11D69203600D563F2 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -378,6 +391,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = ScriptWorker/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -398,6 +412,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = ScriptWorker/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

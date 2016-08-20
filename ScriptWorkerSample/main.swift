@@ -7,6 +7,10 @@
 //
 
 import Foundation
+import ScriptWorker
 
-print("Hello, World!")
+
+let script = ScriptWorker()
+
+print(script.path)
 

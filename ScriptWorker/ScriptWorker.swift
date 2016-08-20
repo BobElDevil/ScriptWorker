@@ -34,9 +34,9 @@ public struct ScriptWorker {
         return (path as NSString).lastPathComponent
     }
 
-    /// Initialize a ScriptWorker object with the given file path
-    public init(path: String) {
-        self.path = path
+    /// Initialize a ScriptWorker object with the given file path. If nil, use the current working directory
+    public init(path: String? = nil) {
+        self.path = path ?? NSFileManager.defaultManager().currentDirectoryPath
     }
 
     // MARK: Attributes
