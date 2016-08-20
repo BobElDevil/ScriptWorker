@@ -10,6 +10,7 @@
 		AA514C9C1D6900BE00D563F2 /* ScriptWorker.h in Headers */ = {isa = PBXBuildFile; fileRef = AA514C9B1D6900BE00D563F2 /* ScriptWorker.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA514CA31D6900BE00D563F2 /* ScriptWorker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA514C981D6900BE00D563F2 /* ScriptWorker.framework */; };
 		AA514CA81D6900BE00D563F2 /* ScriptWorkerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA514CA71D6900BE00D563F2 /* ScriptWorkerTests.swift */; };
+		AA514CBB1D69027400D563F2 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA514CBA1D69027400D563F2 /* main.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -22,6 +23,18 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		AA514CB61D69027400D563F2 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		AA514C981D6900BE00D563F2 /* ScriptWorker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ScriptWorker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA514C9B1D6900BE00D563F2 /* ScriptWorker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScriptWorker.h; sourceTree = "<group>"; };
@@ -29,6 +42,8 @@
 		AA514CA21D6900BE00D563F2 /* ScriptWorkerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScriptWorkerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA514CA71D6900BE00D563F2 /* ScriptWorkerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptWorkerTests.swift; sourceTree = "<group>"; };
 		AA514CA91D6900BE00D563F2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA514CB81D69027400D563F2 /* ScriptWorkerSample */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ScriptWorkerSample; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA514CBA1D69027400D563F2 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +62,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA514CB51D69027400D563F2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -55,6 +77,7 @@
 			children = (
 				AA514C9A1D6900BE00D563F2 /* ScriptWorker */,
 				AA514CA61D6900BE00D563F2 /* ScriptWorkerTests */,
+				AA514CB91D69027400D563F2 /* ScriptWorkerSample */,
 				AA514C991D6900BE00D563F2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -64,6 +87,7 @@
 			children = (
 				AA514C981D6900BE00D563F2 /* ScriptWorker.framework */,
 				AA514CA21D6900BE00D563F2 /* ScriptWorkerTests.xctest */,
+				AA514CB81D69027400D563F2 /* ScriptWorkerSample */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -84,6 +108,14 @@
 				AA514CA91D6900BE00D563F2 /* Info.plist */,
 			);
 			path = ScriptWorkerTests;
+			sourceTree = "<group>";
+		};
+		AA514CB91D69027400D563F2 /* ScriptWorkerSample */ = {
+			isa = PBXGroup;
+			children = (
+				AA514CBA1D69027400D563F2 /* main.swift */,
+			);
+			path = ScriptWorkerSample;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -136,6 +168,23 @@
 			productReference = AA514CA21D6900BE00D563F2 /* ScriptWorkerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		AA514CB71D69027400D563F2 /* ScriptWorkerSample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA514CBC1D69027400D563F2 /* Build configuration list for PBXNativeTarget "ScriptWorkerSample" */;
+			buildPhases = (
+				AA514CB41D69027400D563F2 /* Sources */,
+				AA514CB51D69027400D563F2 /* Frameworks */,
+				AA514CB61D69027400D563F2 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ScriptWorkerSample;
+			productName = ScriptWorkerSample;
+			productReference = AA514CB81D69027400D563F2 /* ScriptWorkerSample */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -150,6 +199,9 @@
 						CreatedOnToolsVersion = 7.3.1;
 					};
 					AA514CA11D6900BE00D563F2 = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
+					AA514CB71D69027400D563F2 = {
 						CreatedOnToolsVersion = 7.3.1;
 					};
 				};
@@ -168,6 +220,7 @@
 			targets = (
 				AA514C971D6900BE00D563F2 /* ScriptWorker */,
 				AA514CA11D6900BE00D563F2 /* ScriptWorkerTests */,
+				AA514CB71D69027400D563F2 /* ScriptWorkerSample */,
 			);
 		};
 /* End PBXProject section */
@@ -202,6 +255,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA514CA81D6900BE00D563F2 /* ScriptWorkerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA514CB41D69027400D563F2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA514CBB1D69027400D563F2 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -307,6 +368,7 @@
 		AA514CAD1D6900BE00D563F2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -319,12 +381,14 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.BobDevil.ScriptWorker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		AA514CAE1D6900BE00D563F2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -362,6 +426,20 @@
 			};
 			name = Release;
 		};
+		AA514CBD1D69027400D563F2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		AA514CBE1D69027400D563F2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -381,6 +459,7 @@
 				AA514CAE1D6900BE00D563F2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		AA514CAF1D6900BE00D563F2 /* Build configuration list for PBXNativeTarget "ScriptWorkerTests" */ = {
 			isa = XCConfigurationList;
@@ -389,6 +468,16 @@
 				AA514CB11D6900BE00D563F2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA514CBC1D69027400D563F2 /* Build configuration list for PBXNativeTarget "ScriptWorkerSample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA514CBD1D69027400D563F2 /* Debug */,
+				AA514CBE1D69027400D563F2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
