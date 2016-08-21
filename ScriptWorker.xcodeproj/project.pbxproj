@@ -16,6 +16,7 @@
 		AA514CDC1D693F2F00D563F2 /* ScriptWorker+Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA514CDB1D693F2F00D563F2 /* ScriptWorker+Actions.swift */; };
 		AA514CDE1D693FB700D563F2 /* ScriptWorker+IO.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA514CDD1D693FB700D563F2 /* ScriptWorker+IO.swift */; };
 		AA514CE01D69401700D563F2 /* ScriptWorker+Commands.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA514CDF1D69401700D563F2 /* ScriptWorker+Commands.swift */; };
+		AA514CE31D69521800D563F2 /* ScriptWorker.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA514C981D6900BE00D563F2 /* ScriptWorker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +35,19 @@
 			remoteInfo = ScriptWorker;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AA514CE21D69520E00D563F2 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				AA514CE31D69521800D563F2 /* ScriptWorker.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		AA514C981D6900BE00D563F2 /* ScriptWorker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ScriptWorker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -187,6 +201,7 @@
 				AA514CC51D6927C500D563F2 /* Sources */,
 				AA514CC61D6927C500D563F2 /* Frameworks */,
 				AA514CC71D6927C500D563F2 /* Resources */,
+				AA514CE21D69520E00D563F2 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -405,11 +420,11 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = ScriptWorker/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.BobDevil.ScriptWorker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -426,11 +441,11 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = ScriptWorker/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.BobDevil.ScriptWorker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
