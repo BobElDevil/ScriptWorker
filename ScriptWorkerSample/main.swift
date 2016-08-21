@@ -31,9 +31,12 @@ script.popPath()
 
 script.pushPath("linkList.txt")
 script.writeLines(["beta", "echo"])
+script.popPath()
+
 
 // Part two, create the symlinks
-let entries = script.readLines().filter{!$0.isEmpty}
+script.pushPath("linkList.txt")
+let entries = script.readLines()
 script.popPath()
 
 var readScript = script
@@ -51,6 +54,6 @@ for entry in entries {
     }
 
     script.pushPath(entry)
-    script.symlink(to: readScript.path)
+    script.symlink(to: script.relativePathTo(readScript))
     script.popPath()
 }

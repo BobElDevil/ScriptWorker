@@ -77,6 +77,41 @@ public struct ScriptWorker {
         return false
     }
 
+    /// Attempts to calculate the relative path to another ScriptWorker. It first standardizes both paths and resolves any symbolic links.
+    /// This means the relative path may not be the 'shortest' route if other symbolic links are involved in the paths.
+    /// Returns the absolute path for the given script worker if the calculation fails
+    public func relativePathTo(to: ScriptWorker) -> String {
+        guard let resolvedURL = url.URLByStandardizingPath?.URLByResolvingSymlinksInPath, toResolvedURL = to.url.URLByStandardizingPath?.URLByResolvingSymlinksInPath else {
+            return to.path
+        }
+
+        guard var pathComponents = resolvedURL.pathComponents, var toPathComponents = toResolvedURL.pathComponents else {
+            return to.path
+        }
+
+        // First remove any path components they have in common
+        while pathComponents.first == toPathComponents.first {
+            if pathComponents.isEmpty || toPathComponents.isEmpty {
+                break
+            }
+
+            pathComponents.removeFirst()
+            toPathComponents.removeFirst()
+        }
+
+        if pathComponents.count > 1 {
+            toPathComponents = Array(count: pathComponents.count - 1, repeatedValue: "..") + toPathComponents
+
+        }
+
+        guard toPathComponents.count > 0 else {
+            return to.path
+        }
+
+        let relativePath = toPathComponents.joinWithSeparator("/")
+        return relativePath
+    }
+
     // Helper for figuring out attributes.
     private func fileStatus() -> (exists: Bool, directory: Bool) {
         var isDirObj: ObjCBool = false
