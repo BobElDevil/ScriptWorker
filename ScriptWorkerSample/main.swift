@@ -14,46 +14,46 @@ import ScriptWorker
 
 var script = ScriptWorker()
 
-script.pushPath("Workspace")
+script.push("Workspace")
 _ = try? script.remove_safe()
 script.makeDirectory()
 
 // Part one, create the files
-script.pushPath("DirOne")
+script.push("DirOne")
 script.makeDirectory()
 
 for file in ["alpha", "beta", "charlie", "delta", "echo"] {
-    script.pushPath(file)
+    script.push(file)
     script.writeString("This file is \(file)")
-    script.popPath()
+    script.pop()
 }
-script.popPath()
+script.pop()
 
-script.pushPath("linkList.txt")
+script.push("linkList.txt")
 script.writeLines(["beta", "echo"])
-script.popPath()
+script.pop()
 
 
 // Part two, create the symlinks
-script.pushPath("linkList.txt")
+script.push("linkList.txt")
 let entries = script.readLines()
-script.popPath()
+script.pop()
 
 var readScript = script
-readScript.pushPath("DirOne")
+readScript.push("DirOne")
 
-script.pushPath("DirTwo")
+script.push("DirTwo")
 script.makeDirectory()
 
 for entry in entries {
-    readScript.pushPath(entry)
-    defer { readScript.popPath() }
+    readScript.push(entry)
+    defer { readScript.pop() }
 
     guard readScript.exists else {
         continue
     }
 
-    script.pushPath(entry)
+    script.push(entry)
     script.symlink(to: script.relativePathTo(readScript))
-    script.popPath()
+    script.pop()
 }

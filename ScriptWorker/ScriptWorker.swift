@@ -272,7 +272,7 @@ public struct ScriptWorker {
     private var pathStack: [String] = []
 
     // Change the workers current path, and storing the previous path in the stack. The passed in path can be absolute or relative
-    public mutating func pushPath(newPath: String) {
+    public mutating func push(newPath: String) {
         pathStack.append(path)
         if (newPath as NSString).absolutePath {
             path = newPath
@@ -282,7 +282,7 @@ public struct ScriptWorker {
     }
 
     // Change the current path back to the previous path. Exits if the directory stack is empty
-    public mutating func popPath() {
+    public mutating func pop() {
         guard !pathStack.isEmpty else {
             exitMsg("Tried to pop directory with an empty directory stack!")
         }
