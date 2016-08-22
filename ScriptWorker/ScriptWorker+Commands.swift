@@ -12,7 +12,7 @@ extension ScriptWorker {
     /// Launches the given command with the working directory set to path (or the parent directory if path is a file)
     ///
     /// Returns a tuple with status, stdout and stderr
-    public func launchCommandForOutput(command: String, arguments: [String] = []) -> (Int, String, String) {
+    public func launchCommandForOutput(command: String, arguments: [String] = [], exitOnFailure: Bool = false) -> (Int, String, String) {
         var outString: String = ""
         var errString: String = ""
         let status = launchCommand(command, arguments: arguments, configure:  { task in
@@ -52,7 +52,7 @@ extension ScriptWorker {
     /// Launches the given command with the working directory set to path (or the parent directory if path is a file), forwarding stderr and stdout to the current process
     ///
     /// Returns the status.
-    public func launchCommand(command: String, arguments: [String] = []) -> Int {
+    public func launchCommand(command: String, arguments: [String] = [], exitOnFailure: Bool = false) -> Int {
         return launchCommand(command, arguments: arguments, configure: { task in
             task.standardOutput = NSFileHandle.fileHandleWithStandardOutput()
             task.standardError = NSFileHandle.fileHandleWithStandardError()
@@ -60,7 +60,7 @@ extension ScriptWorker {
     }
 
     // Launch the task and return the status. Configure block for configuring stdout/stderr
-    private func launchCommand(command: String, arguments: [String] = [], configure: (NSTask -> Void)) -> Int {
+    private func launchCommand(command: String, arguments: [String] = [], exitOnFailure: Bool = false, configure: (NSTask -> Void)) -> Int {
         let task = NSTask()
         if isDirectory {
             task.currentDirectoryPath = path
@@ -75,6 +75,10 @@ extension ScriptWorker {
 
         task.launch()
         task.waitUntilExit()
-        return Int(task.terminationStatus)
+        let status = Int(task.terminationStatus)
+        if exitOnFailure && status != 0 {
+            exitMsg("Error: \(command) failed with exit code \(status)")
+        }
+        return status
     }
 }
