@@ -38,7 +38,7 @@ extension ScriptWorker {
 
     /// Indicates whether the current path is a symbolic link
     public var isSymlink: Bool {
-        if let _ = try? fileManager.destinationOfSymbolicLinkAtPath(path) {
+        if let _ = try? fileManager.destinationOfSymbolicLink(atPath: path) {
             return true
         }
 
@@ -48,7 +48,7 @@ extension ScriptWorker {
     // Helper for figuring out attributes.
     private func fileStatus() -> (exists: Bool, directory: Bool) {
         var isDirObj: ObjCBool = false
-        let exists = fileManager.fileExistsAtPath(path, isDirectory: &isDirObj)
+        let exists = fileManager.fileExists(atPath: path, isDirectory: &isDirObj)
         return (exists, isDirObj.boolValue)
     }
 }

@@ -13,7 +13,7 @@ public struct ScriptWorker {
 
     /// Initialize a ScriptWorker object with the given file path. If nil, use the current working directory
     public init(path: String? = nil) {
-        self.path = path ?? NSFileManager.defaultManager().currentDirectoryPath
+        self.path = path ?? FileManager.default.currentDirectoryPath
     }
 
     /// The file path represented by this struct
@@ -25,20 +25,20 @@ public struct ScriptWorker {
         return (path as NSString).lastPathComponent
     }
 
-    var url: NSURL {
-        return NSURL(fileURLWithPath: path)
+    var url: URL {
+        return URL(fileURLWithPath: path)
     }
 
-    let fileManager = NSFileManager.defaultManager()
+    let fileManager = FileManager.default
 
     /// Returns an array of ScriptWorker's representing the contents at 'path'. If path is not a directory, returns an empty array
     public var contents: [ScriptWorker] {
-        guard let items = try? fileManager.contentsOfDirectoryAtPath(path) else {
+        guard let items = try? fileManager.contentsOfDirectory(atPath: path) else {
             return []
         }
 
         return items.map { item in
-            let newPath = url.URLByAppendingPathComponent(item)!.path!
+            let newPath = url.appendingPathComponent(item).path
             return ScriptWorker(path: newPath)
         }
     }
@@ -46,14 +46,9 @@ public struct ScriptWorker {
     /// Attempts to calculate the relative path to another ScriptWorker. It first standardizes both paths and resolves any symbolic links.
     /// This means the relative path may not be the 'shortest' route if other symbolic links are involved in the paths.
     /// Returns the absolute path for the given script worker if the calculation fails
-    public func relativePathTo(to: ScriptWorker) -> String {
-        guard let resolvedURL = url.URLByStandardizingPath?.URLByResolvingSymlinksInPath, toResolvedURL = to.url.URLByStandardizingPath?.URLByResolvingSymlinksInPath else {
-            return to.path
-        }
-
-        guard var pathComponents = resolvedURL.pathComponents, var toPathComponents = toResolvedURL.pathComponents else {
-            return to.path
-        }
+    public func relative(to: ScriptWorker) -> String {
+        var pathComponents = url.standardizedFileURL.resolvingSymlinksInPath().pathComponents
+        var toPathComponents = to.url.standardizedFileURL.resolvingSymlinksInPath().pathComponents
 
         // First remove any path components they have in common
         while pathComponents.first == toPathComponents.first {
@@ -66,7 +61,7 @@ public struct ScriptWorker {
         }
 
         if pathComponents.count > 1 {
-            toPathComponents = Array(count: pathComponents.count - 1, repeatedValue: "..") + toPathComponents
+            toPathComponents = Array(repeating: "..", count: pathComponents.count - 1) + toPathComponents
 
         }
 
@@ -74,7 +69,7 @@ public struct ScriptWorker {
             return to.path
         }
 
-        let relativePath = toPathComponents.joinWithSeparator("/")
+        let relativePath = toPathComponents.joined(separator: "/")
         return relativePath
     }
 
@@ -83,12 +78,12 @@ public struct ScriptWorker {
     private var pathStack: [String] = []
 
     // Change the workers current path, and storing the previous path in the stack. The passed in path can be absolute or relative
-    public mutating func push(newPath: String) {
+    public mutating func push(_ newPath: String) {
         pathStack.append(path)
-        if (newPath as NSString).absolutePath {
+        if (newPath as NSString).isAbsolutePath {
             path = newPath
         } else {
-            path = url.URLByAppendingPathComponent(newPath)!.URLByStandardizingPath!.path!
+            path = url.appendingPathComponent(newPath).resolvingSymlinksInPath().path
         }
     }
 
@@ -101,12 +96,12 @@ public struct ScriptWorker {
     }
 }
 
-@noreturn func exitMsg(msg: String) {
+func exitMsg(_ msg: String) -> Never {
     print(msg)
     exit(1)
 }
 
-@noreturn func exitError(error: ErrorType) {
+func exitError(_ error: Error) -> Never {
     let nsErr = error as NSError
     var msg = nsErr.localizedDescription
     if let reason = nsErr.localizedFailureReason {
@@ -115,7 +110,7 @@ public struct ScriptWorker {
     exitMsg(msg)
 }
 
-func exitOnError(@noescape action: (Void throws -> Void)) {
+func exitOnError(_ action: (() throws -> Void)) {
     do {
         try action()
     } catch let error {
