@@ -48,7 +48,7 @@ extension ScriptWorker {
         if (toPath as NSString).absolutePath {
             destinationURL = NSURL(fileURLWithPath: toPath)
         } else {
-            destinationURL = url.URLByAppendingPathComponent(toPath)
+            destinationURL = url.URLByAppendingPathComponent(toPath)!
         }
         try fileManager.copyItemAtURL(url, toURL: destinationURL)
     }

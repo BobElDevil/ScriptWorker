@@ -38,7 +38,7 @@ public struct ScriptWorker {
         }
 
         return items.map { item in
-            let newPath = url.URLByAppendingPathComponent(item).path!
+            let newPath = url.URLByAppendingPathComponent(item)!.path!
             return ScriptWorker(path: newPath)
         }
     }
@@ -88,7 +88,7 @@ public struct ScriptWorker {
         if (newPath as NSString).absolutePath {
             path = newPath
         } else {
-            path = url.URLByAppendingPathComponent(newPath).URLByStandardizingPath!.path!
+            path = url.URLByAppendingPathComponent(newPath)!.URLByStandardizingPath!.path!
         }
     }
 
