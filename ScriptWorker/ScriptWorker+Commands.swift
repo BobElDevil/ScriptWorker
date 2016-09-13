@@ -15,11 +15,11 @@ extension ScriptWorker {
     public func launchCommandForOutput(command: String, arguments: [String] = [], exitOnFailure: Bool = false) -> (Int, String, String) {
         var outString: String = ""
         var errString: String = ""
-        let status = launchCommand(command, arguments: arguments, configure:  { task in
+        let status = launch(command: command, arguments: arguments, configure:  { task in
             // Sets up stderr or stdout for reading, and returns a block that should be called once
             // the task is complete
-            func setupPipe(forStdout forStdout: Bool) -> (Void -> String) {
-                let pipe = NSPipe()
+            func setupPipe(forStdout: Bool) -> (() -> String) {
+                let pipe = Pipe()
                 if forStdout {
                     task.standardOutput = pipe
                 } else {
@@ -30,7 +30,7 @@ extension ScriptWorker {
 
                 return {
                     let data = readHandle.readDataToEndOfFile()
-                    guard let string = String(data: data, encoding: NSUTF8StringEncoding) else {
+                    guard let string = String(data: data, encoding: .utf8) else {
                         fatalError("Failed to read input from command \(command)")
                     }
                     return string
@@ -52,20 +52,20 @@ extension ScriptWorker {
     /// Launches the given command with the working directory set to path (or the parent directory if path is a file), forwarding stderr and stdout to the current process
     ///
     /// Returns the status.
-    public func launchCommand(command: String, arguments: [String] = [], exitOnFailure: Bool = false) -> Int {
-        return launchCommand(command, arguments: arguments, configure: { task in
-            task.standardOutput = NSFileHandle.fileHandleWithStandardOutput()
-            task.standardError = NSFileHandle.fileHandleWithStandardError()
+    public func launch(command: String, arguments: [String] = [], exitOnFailure: Bool = false) -> Int {
+        return launch(command: command, arguments: arguments, configure: { task in
+            task.standardOutput = FileHandle.standardOutput
+            task.standardError = FileHandle.standardError
         })
     }
 
     // Launch the task and return the status. Configure block for configuring stdout/stderr
-    private func launchCommand(command: String, arguments: [String] = [], exitOnFailure: Bool = false, configure: (NSTask -> Void)) -> Int {
-        let task = NSTask()
+    private func launch(command: String, arguments: [String] = [], exitOnFailure: Bool = false, configure: ((Process) -> Void)) -> Int {
+        let task = Process()
         if isDirectory {
             task.currentDirectoryPath = path
         } else {
-            task.currentDirectoryPath = url.URLByDeletingLastPathComponent!.path!
+            task.currentDirectoryPath = url.deletingLastPathComponent().path
         }
 
         task.launchPath = "/usr/bin/env" // Use env so we can rely on items in $PATH

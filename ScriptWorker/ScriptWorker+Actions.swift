@@ -22,7 +22,7 @@ extension ScriptWorker {
     }
 
     public func remove_safe() throws {
-        try fileManager.removeItemAtURL(url)
+        try fileManager.removeItem(at: url)
     }
 
     /// Create a directory at path.
@@ -33,7 +33,7 @@ extension ScriptWorker {
     }
 
     public func makeDirectory_safe(withIntermediates intermediates: Bool = false) throws {
-        try fileManager.createDirectoryAtURL(url, withIntermediateDirectories: intermediates, attributes: nil)
+        try fileManager.createDirectory(at: url, withIntermediateDirectories: intermediates, attributes: nil)
     }
 
     /// Copy the item at path to the location defined by 'toPath'. toPath can be absolute or relative
@@ -44,13 +44,13 @@ extension ScriptWorker {
     }
 
     public func copy_safe(to toPath: String) throws {
-        let destinationURL: NSURL
-        if (toPath as NSString).absolutePath {
-            destinationURL = NSURL(fileURLWithPath: toPath)
+        let destinationURL: URL
+        if (toPath as NSString).isAbsolutePath {
+            destinationURL = URL(fileURLWithPath: toPath)
         } else {
-            destinationURL = url.URLByAppendingPathComponent(toPath)!
+            destinationURL = url.appendingPathComponent(toPath)
         }
-        try fileManager.copyItemAtURL(url, toURL: destinationURL)
+        try fileManager.copyItem(at: url, to: destinationURL)
     }
 
     /// Create a symlink at path to the location defined by 'toPath'. toPath can be absolute or relative
@@ -61,11 +61,11 @@ extension ScriptWorker {
     }
 
     public func symlink_safe(to toPath: String) throws {
-        if (toPath as NSString).absolutePath {
-            try fileManager.createSymbolicLinkAtURL(url, withDestinationURL: NSURL(fileURLWithPath: toPath))
+        if (toPath as NSString).isAbsolutePath {
+            try fileManager.createSymbolicLink(at: url, withDestinationURL: URL(fileURLWithPath: toPath))
         } else {
             // Use path based API to make sure it ends up relative
-            try fileManager.createSymbolicLinkAtPath(url.path!, withDestinationPath: toPath)
+            try fileManager.createSymbolicLink(atPath: url.path, withDestinationPath: toPath)
         }
     }
 }

@@ -54,6 +54,6 @@ for entry in entries {
     }
 
     script.push(entry)
-    script.symlink(to: script.relativePathTo(readScript))
+    script.symlink(to: script.relative(to: readScript))
     script.pop()
 }
