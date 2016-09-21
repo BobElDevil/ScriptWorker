@@ -17,6 +17,7 @@
 		AA514CDE1D693FB700D563F2 /* ScriptWorker+IO.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA514CDD1D693FB700D563F2 /* ScriptWorker+IO.swift */; };
 		AA514CE01D69401700D563F2 /* ScriptWorker+Commands.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA514CDF1D69401700D563F2 /* ScriptWorker+Commands.swift */; };
 		AA514CE31D69521800D563F2 /* ScriptWorker.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA514C981D6900BE00D563F2 /* ScriptWorker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B19D61381D93329C008BF65D /* trap.swift in Sources */ = {isa = PBXBuildFile; fileRef = B19D61371D93329C008BF65D /* trap.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +65,7 @@
 		AA514CDB1D693F2F00D563F2 /* ScriptWorker+Actions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ScriptWorker+Actions.swift"; sourceTree = "<group>"; };
 		AA514CDD1D693FB700D563F2 /* ScriptWorker+IO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ScriptWorker+IO.swift"; sourceTree = "<group>"; };
 		AA514CDF1D69401700D563F2 /* ScriptWorker+Commands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ScriptWorker+Commands.swift"; sourceTree = "<group>"; };
+		B19D61371D93329C008BF65D /* trap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = trap.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +117,7 @@
 		AA514C9A1D6900BE00D563F2 /* ScriptWorker */ = {
 			isa = PBXGroup;
 			children = (
+				B19D61371D93329C008BF65D /* trap.swift */,
 				AA514C9B1D6900BE00D563F2 /* ScriptWorker.h */,
 				AA514C9D1D6900BE00D563F2 /* Info.plist */,
 				AA514CB21D69012900D563F2 /* ScriptWorker.swift */,
@@ -286,6 +289,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B19D61381D93329C008BF65D /* trap.swift in Sources */,
 				AA514CB31D69012900D563F2 /* ScriptWorker.swift in Sources */,
 				AA514CDA1D693E8C00D563F2 /* ScriptWorker+Attributes.swift in Sources */,
 				AA514CE01D69401700D563F2 /* ScriptWorker+Commands.swift in Sources */,

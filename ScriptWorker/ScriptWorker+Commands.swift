@@ -59,6 +59,8 @@ extension ScriptWorker {
         })
     }
 
+    private static var childPid: pid_t = -1
+
     // Launch the task and return the status. Configure block for configuring stdout/stderr
     private func launch(command: String, arguments: [String] = [], exitOnFailure: Bool = false, configure: ((Process) -> Void)) -> Int {
         let task = Process()
@@ -73,12 +75,26 @@ extension ScriptWorker {
 
         configure(task)
 
-        task.launch()
-        task.waitUntilExit()
+        launchAndWait(forTask: task)
+
         let status = Int(task.terminationStatus)
         if exitOnFailure && status != 0 {
             exitMsg("Error: \(command) failed with exit code \(status)")
         }
         return status
     }
+
+    private func launchAndWait(forTask task: Process) {
+        // `Process` is put in a different process group, so to avoid orphaned processes, we install our own signal handler to forward our signals to our child
+        trap(signal: .INT, action: { sig in
+            if ScriptWorker.childPid != -1 {
+                kill(ScriptWorker.childPid, sig)
+            }
+        })
+        task.launch()
+        ScriptWorker.childPid = task.processIdentifier
+        task.waitUntilExit()
+        ScriptWorker.childPid = -1
+    }
+
 }
