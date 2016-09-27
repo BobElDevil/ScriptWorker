@@ -12,10 +12,10 @@ extension ScriptWorker {
     /// Launches the given command with the working directory set to path (or the parent directory if path is a file)
     ///
     /// Returns a tuple with status, stdout and stderr
-    public func launch(commandForOutput command: String, arguments: [String] = [], exitOnFailure: Bool = false) -> (Int, String, String) {
+    public func launch(commandForOutput command: String, arguments: [String] = [], environment: [String: String] = [:], logCommand: Bool = true, exitOnFailure: Bool = false) -> (Int, String, String) {
         var outString: String = ""
         var errString: String = ""
-        let status = launch(command: command, arguments: arguments, configure:  { task in
+        let status = launch(command: command, arguments: arguments, environment: environment, logCommand: logCommand, exitOnFailure: exitOnFailure, configure:  { task in
             // Sets up stderr or stdout for reading, and returns a block that should be called once
             // the task is complete
             func setupPipe(forStdout: Bool) -> (() -> String) {
@@ -52,8 +52,8 @@ extension ScriptWorker {
     /// Launches the given command with the working directory set to path (or the parent directory if path is a file), forwarding stderr and stdout to the current process
     ///
     /// Returns the status.
-    @discardableResult public func launch(command: String, arguments: [String] = [], exitOnFailure: Bool = false) -> Int {
-        return launch(command: command, arguments: arguments, configure: { task in
+    @discardableResult public func launch(command: String, arguments: [String] = [], environment: [String: String] = [:], logCommand: Bool = true, exitOnFailure: Bool = false) -> Int {
+        return launch(command: command, arguments: arguments, environment: environment, logCommand: logCommand, exitOnFailure: exitOnFailure, configure: { task in
             task.standardOutput = FileHandle.standardOutput
             task.standardError = FileHandle.standardError
         })
@@ -62,7 +62,7 @@ extension ScriptWorker {
     private static var childPid: pid_t = -1
 
     // Launch the task and return the status. Configure block for configuring stdout/stderr
-    private func launch(command: String, arguments: [String] = [], exitOnFailure: Bool = false, configure: ((Process) -> Void)) -> Int {
+    private func launch(command: String, arguments: [String], environment: [String: String], logCommand: Bool, exitOnFailure: Bool, configure: ((Process) -> Void)) -> Int {
         let task = Process()
         if isDirectory {
             task.currentDirectoryPath = path
@@ -71,8 +71,23 @@ extension ScriptWorker {
         }
 
         task.launchPath = "/usr/bin/env" // Use env so we can rely on items in $PATH
-        task.arguments = [command] + arguments
+        // Since we're using 'env' already, we can just prepend the environment variables to the arguments.
 
+        let envArguments = environment.map { key, value in
+            "\(key)=\(value)"
+        }
+
+        if logCommand {
+            print("% Running '\(command) \(arguments.joined(separator: " "))'")
+            if environment.count > 0 {
+                print("% with environment:")
+                environment.forEach { key, value in
+                    print("%\t\(key) = \(value)")
+                }
+            }
+        }
+
+        task.arguments = envArguments + [command] + arguments
         configure(task)
 
         launchAndWait(forTask: task)
