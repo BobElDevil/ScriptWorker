@@ -53,6 +53,23 @@ extension ScriptWorker {
         try fileManager.copyItem(at: url, to: destinationURL)
     }
 
+    /// Move the item at path to the location defined by 'toPath'. toPath can be absolute or relative
+    public func move(to toPath: String) {
+        exitOnError {
+            try move_safe(to: toPath)
+        }
+    }
+
+    public func move_safe(to toPath: String) throws {
+        let destinationURL: URL
+        if (toPath as NSString).isAbsolutePath {
+            destinationURL = URL(fileURLWithPath: toPath)
+        } else {
+            destinationURL = url.appendingPathComponent(toPath)
+        }
+        try fileManager.moveItem(at: url, to: destinationURL)
+    }
+
     /// Create a symlink at path to the location defined by 'toPath'. toPath can be absolute or relative
     public func symlink(to toPath: String) {
         exitOnError {
