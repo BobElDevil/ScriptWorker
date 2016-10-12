@@ -21,6 +21,7 @@ extension ScriptWorker {
 
     public func read_safe() throws -> Data {
         let fileHandle = try FileHandle(forReadingFrom: url)
+        log(action: "Reading contents of \(path)")
         return fileHandle.readDataToEndOfFile()
     }
 
@@ -60,6 +61,7 @@ extension ScriptWorker {
     }
 
     public func write_safe(_ data: Data) throws {
+        log(action: "Writing to file \(path)")
         try data.write(to: url, options: [])
     }
 

@@ -16,13 +16,22 @@ public struct ScriptWorker {
         self.path = path ?? FileManager.default.currentDirectoryPath
     }
 
-    /// The file path represented by this struct
+    /// The file path represented by this struct.
     public var path: String
 
 
     /// Name of the currently pointed to item, i.e., the last path component
     public var name: String {
         return (path as NSString).lastPathComponent
+    }
+
+    /// Prints to stdout any actions the worker takes. Defaults to true
+    public var logActions: Bool = true
+
+    func log(action: String) {
+        if logActions {
+            print("% \(action)")
+        }
     }
 
     var url: URL {

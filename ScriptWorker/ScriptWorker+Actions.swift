@@ -22,6 +22,7 @@ extension ScriptWorker {
     }
 
     public func remove_safe() throws {
+        log(action: "Removing \(path)")
         try fileManager.removeItem(at: url)
     }
 
@@ -33,6 +34,7 @@ extension ScriptWorker {
     }
 
     public func makeDirectory_safe(withIntermediates intermediates: Bool = false) throws {
+        log(action: "Creating directory \(path)")
         try fileManager.createDirectory(at: url, withIntermediateDirectories: intermediates, attributes: nil)
     }
 
@@ -50,6 +52,7 @@ extension ScriptWorker {
         } else {
             destinationURL = url.appendingPathComponent(toPath)
         }
+        log(action: "Copying \(path) to \(destinationURL.path)")
         try fileManager.copyItem(at: url, to: destinationURL)
     }
 
@@ -67,6 +70,7 @@ extension ScriptWorker {
         } else {
             destinationURL = url.appendingPathComponent(toPath)
         }
+        log(action: "Moving \(path) to \(destinationURL.path)")
         try fileManager.moveItem(at: url, to: destinationURL)
     }
 
@@ -78,6 +82,7 @@ extension ScriptWorker {
     }
 
     public func symlink_safe(to toPath: String) throws {
+        log(action: "Creating symlink from \(path) to \(toPath)")
         if (toPath as NSString).isAbsolutePath {
             try fileManager.createSymbolicLink(at: url, withDestinationURL: URL(fileURLWithPath: toPath))
         } else {
