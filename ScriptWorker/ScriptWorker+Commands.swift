@@ -78,12 +78,6 @@ extension ScriptWorker {
         }
 
         log(action: "Running '\(command) \(arguments.joined(separator: " "))'")
-        if environment.count > 0 {
-            log(action: "with environment:")
-            environment.forEach { key, value in
-                log(action: "\t\(key) = \(value)")
-            }
-        }
 
         task.arguments = envArguments + [command] + arguments
         configure(task)
