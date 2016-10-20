@@ -73,7 +73,8 @@ extension ScriptWorker {
 
         log(action: "Running '\(command) \(arguments.joined(separator: " "))'")
 
-        task.arguments = envArguments + [command] + arguments
+        // Unbuffer the IO here since we use pipes now so setlinebuf doesn't work
+        task.arguments = ["NSUnbufferedIO=YES"] + envArguments + [command] + arguments
 
         // Sets up stderr or stdout for reading, and returns a block that should be called once
         // the task is complete

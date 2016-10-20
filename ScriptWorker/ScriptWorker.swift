@@ -13,9 +13,6 @@ public struct ScriptWorker {
 
     /// Initialize a ScriptWorker object with the given file path. If nil, use the current working directory
     public init(path: String? = nil) {
-        // Set line buffering so our output doesn't get weirdly intermixed with sub process output
-        setlinebuf(stdout)
-        setlinebuf(stderr)
         self.path = path ?? FileManager.default.currentDirectoryPath
     }
 
