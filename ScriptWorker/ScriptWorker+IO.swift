@@ -88,4 +88,22 @@ extension ScriptWorker {
         let string = lines.joined(separator: "\n")
         try writeString_safe(string)
     }
+
+    public func readFileHandle() -> FileHandle? {
+        return try? FileHandle(forReadingFrom: url)
+    }
+
+    public func writeFileHandle() -> FileHandle? {
+        return try? FileHandle(forWritingTo: url)
+    }
+
+    public func touch() {
+        do {
+            try fileManager.setAttributes([.modificationDate: Date()], ofItemAtPath: path)
+        } catch {
+            // Must not exist, create a file there
+            write(Data())
+        }
+    }
+
 }
