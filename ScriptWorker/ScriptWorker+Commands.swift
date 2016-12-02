@@ -9,13 +9,16 @@
 import Foundation
 
 extension ScriptWorker {
+
+    public typealias DataHandler = (Data, Bool) -> Void
+    public typealias TerminationHandler = (Process) -> Void
     /// Launches the given command with the working directory set to path (or the parent directory if path is a file)
     ///
     /// Returns a tuple with status, stdout and stderr
     public func launch(commandForOutput command: String, arguments: [String] = [], environment: [String: String] = [:], exitOnFailure: Bool = false) -> (Int, String, String) {
         var outData = Data()
         var errData = Data()
-        let status = _launch(command: command, arguments: arguments, environment: environment, exitOnFailure: exitOnFailure, dataHandler:  { (data, isStdout) in
+        let status = _launchAndWait(command: command, arguments: arguments, environment: environment, exitOnFailure: exitOnFailure, dataHandler:  { (data, isStdout) in
             if (isStdout) {
                 outData.append(data)
             } else {
@@ -38,11 +41,11 @@ extension ScriptWorker {
     /// Note: While dataHandler is technically marked '@escaping', because we always wait for the task to complete, you can be guaranteed that dataHandler will not be called after this method completes.
     ///
     /// Returns the status.
-    @discardableResult public func launch(command: String, arguments: [String] = [], environment: [String: String] = [:], exitOnFailure: Bool = false, dataHandler: ((Data, Bool) -> Void)? = nil) -> Int {
+    @discardableResult public func launch(command: String, arguments: [String] = [], environment: [String: String] = [:], exitOnFailure: Bool = false, dataHandler: DataHandler? = nil) -> Int {
         if let providedHandler = dataHandler {
-            return _launch(command: command, arguments: arguments, environment: environment, exitOnFailure: exitOnFailure, dataHandler: providedHandler)
+            return _launchAndWait(command: command, arguments: arguments, environment: environment, exitOnFailure: exitOnFailure, dataHandler: providedHandler)
         } else {
-            return _launch(command: command, arguments: arguments, environment: environment, exitOnFailure: exitOnFailure, dataHandler: { (data, isStdout) in
+            return _launchAndWait(command: command, arguments: arguments, environment: environment, exitOnFailure: exitOnFailure, dataHandler: { (data, isStdout) in
                 if isStdout {
                     FileHandle.standardOutput.write(data)
                 } else {
@@ -52,11 +55,26 @@ extension ScriptWorker {
         }
     }
 
+    // MARK: Background commands
 
+    public func launchBackground(command: String, arguments: [String] = [], environment: [String: String] = [:], dataHandler: DataHandler? = nil, terminationHandler: TerminationHandler? = nil) -> Process {
+        return _launch(command: command, arguments: arguments, environment: environment, dataHandler: dataHandler, terminationHandler: terminationHandler)
+    }
 
-    private static var childPid: pid_t = -1
-    // Internal function used by all the public variants for the bulk of the launch work
-    private func _launch(command: String, arguments: [String], environment: [String: String], exitOnFailure: Bool, dataHandler: @escaping (Data, Bool) -> Void) -> Int {
+    // MARK: Internal methods
+
+    private func _launchAndWait(command: String, arguments: [String], environment: [String: String], exitOnFailure: Bool, dataHandler: DataHandler? = nil) -> Int {
+        let task = _launch(command: command, arguments: arguments, environment: environment, dataHandler: dataHandler, terminationHandler: {_ in})
+        task.waitUntilExit()
+
+        let status = Int(task.terminationStatus)
+        if exitOnFailure && status != 0 {
+            exitMsg("Error: \(command) failed with exit code \(status)")
+        }
+        return status
+    }
+
+    private func _launch(command: String, arguments: [String], environment: [String: String], dataHandler: DataHandler? = nil, terminationHandler: TerminationHandler? = nil) -> Process {
         let task = Process()
         if isDirectory {
             task.currentDirectoryPath = path
@@ -76,60 +94,84 @@ extension ScriptWorker {
         // Unbuffer the IO here since we use pipes now so setlinebuf doesn't work
         task.arguments = ["NSUnbufferedIO=YES"] + envArguments + [command] + arguments
 
-        // Sets up stderr or stdout for reading, and returns a block that should be called once
-        // the task is complete
-        func setupPipe(forStdout: Bool) -> ((Void) -> Void)  {
-            let pipe = Pipe()
-            if forStdout {
-                task.standardOutput = pipe
-            } else {
-                task.standardError = pipe
+        if let dataHandler = dataHandler {
+            // Sets up stderr or stdout for reading, and returns a block that should be called once
+            // the task is complete
+            func setupPipe(forStdout: Bool) -> ((Void) -> Void)  {
+                let pipe = Pipe()
+                if forStdout {
+                    task.standardOutput = pipe
+                } else {
+                    task.standardError = pipe
+                }
+
+                let readHandle = pipe.fileHandleForReading
+                let semaphore = DispatchSemaphore(value: 1)
+
+                readHandle.readabilityHandler = { handle in
+                    semaphore.wait()
+                    let newData = handle.availableData
+                    dataHandler(newData, forStdout)
+                    semaphore.signal()
+                }
+
+                return {
+                    // The 'readabilityHandler' for a file handle doesn't get triggered for EOF for whatever reason, so we clear out the readability handler and read the last available data when the task is done.
+                    semaphore.wait()
+                    readHandle.readabilityHandler = nil
+                    dataHandler(readHandle.readDataToEndOfFile(), forStdout)
+                    semaphore.signal()
+                }
             }
-
-            let readHandle = pipe.fileHandleForReading
-            let semaphore = DispatchSemaphore(value: 1)
-
-            readHandle.readabilityHandler = { handle in
-                semaphore.wait()
-                let newData = handle.availableData
-                dataHandler(newData, forStdout)
-                semaphore.signal()
-            }
-
-            return {
-                // The 'readabilityHandler' for a file handle doesn't get triggered for EOF for whatever reason, so we clear out the readability handler and read the last available data when the task is done.
-                semaphore.wait()
-                readHandle.readabilityHandler = nil
-                dataHandler(readHandle.readDataToEndOfFile(), forStdout)
-                semaphore.signal()
+            let outComp = setupPipe(forStdout: true)
+            let errComp = setupPipe(forStdout: false)
+            task.terminationHandler = { _ in
+                outComp()
+                errComp()
             }
         }
-        let outComp = setupPipe(forStdout: true)
-        let errComp = setupPipe(forStdout: false)
-        task.terminationHandler = { _ in
-            outComp()
-            errComp()
+        if let terminationHandler = terminationHandler {
+            nestTerminationHandler(forTask: task, handler: terminationHandler)
         }
-        _launchAndWait(forTask: task)
+        _launch(forTask: task)
+        return task
 
-        let status = Int(task.terminationStatus)
-        if exitOnFailure && status != 0 {
-            exitMsg("Error: \(command) failed with exit code \(status)")
-        }
-        return status
     }
 
-    private func _launchAndWait(forTask task: Process) {
-        // `Process` is put in a different process group, so to avoid orphaned processes, we install our own signal handler to forward our signals to our child
-        trap(signal: .INT, action: { sig in
-            if ScriptWorker.childPid != -1 {
-                kill(ScriptWorker.childPid, sig)
-            }
-        })
+    // `Process` is put in a different process group, so to avoid orphaned processes, we install our own signal handler to forward our signals to our child
+    // Adds a termination handler to the Process, so should be the _last_ thing called after any other termination handling has bene setup
+    private static var childPids: Set<pid_t> = []
+    private func _launch(forTask task: Process) {
+        setupTrap()
         task.launch()
-        ScriptWorker.childPid = task.processIdentifier
-        task.waitUntilExit()
-        ScriptWorker.childPid = -1
+        ScriptWorker.childPids.insert(task.processIdentifier)
+        nestTerminationHandler(forTask: task) { theTask in
+            ScriptWorker.childPids.remove(theTask.processIdentifier)
+        }
     }
+
+    private func nestTerminationHandler(forTask task: Process, handler: @escaping TerminationHandler) {
+        if let existingHandler = task.terminationHandler {
+            task.terminationHandler = { theTask in
+                existingHandler(theTask)
+                handler(theTask)
+            }
+        } else {
+            task.terminationHandler = handler
+        }
+    }
+
+    private func setupTrap() {
+        trap(signal: .INT, action: { sig in
+            let pids = ScriptWorker.childPids
+            for pid in pids {
+                kill(pid, sig)
+            }
+            signal(sig, SIG_DFL)
+            raise(sig)
+        })
+    }
+    
+
 
 }
