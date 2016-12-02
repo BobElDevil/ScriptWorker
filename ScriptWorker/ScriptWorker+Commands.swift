@@ -138,15 +138,22 @@ extension ScriptWorker {
 
     }
 
+    class BundleLookup { } // So we can use the Bundle(forClass:) initializer
+
     // `Process` is put in a different process group, so to avoid orphaned processes, we install our own signal handler to forward our signals to our child
     // Adds a termination handler to the Process, so should be the _last_ thing called after any other termination handling has bene setup
     private static var childPids: Set<pid_t> = []
     private func _launch(forTask task: Process) {
-        setupTrap()
+        setupTraps()
         task.launch()
-        ScriptWorker.childPids.insert(task.processIdentifier)
+        let childPid = task.processIdentifier
+        let watcher = Process()
+        watcher.launchPath = Bundle(for: BundleLookup.self).path(forResource: "ProcessParentWatcher", ofType: nil)
+        watcher.arguments = ["\(ProcessInfo.processInfo.processIdentifier)", "\(childPid)"]
+        watcher.launch()
+        ScriptWorker.childPids.insert(childPid)
         nestTerminationHandler(forTask: task) { theTask in
-            ScriptWorker.childPids.remove(theTask.processIdentifier)
+            ScriptWorker.childPids.remove(childPid)
         }
     }
 
@@ -161,15 +168,19 @@ extension ScriptWorker {
         }
     }
 
-    private func setupTrap() {
-        trap(signal: .INT, action: { sig in
-            let pids = ScriptWorker.childPids
-            for pid in pids {
-                kill(pid, sig)
-            }
-            signal(sig, SIG_DFL)
-            raise(sig)
-        })
+    private func setupTraps() {
+        let signalsToTrap: [Signal] = [.HUP, .INT, .QUIT, .ABRT, .KILL, .ALRM, .TERM]
+        for sig in signalsToTrap {
+            trap(signal: sig, action: { theSig in
+                let pids = ScriptWorker.childPids
+                for pid in pids {
+                    print("Killing the child")
+                    kill(pid, theSig)
+                }
+                signal(theSig, SIG_DFL)
+                raise(theSig)
+            })
+        }
     }
     
 
