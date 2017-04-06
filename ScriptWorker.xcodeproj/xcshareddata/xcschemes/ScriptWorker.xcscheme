@@ -20,6 +20,20 @@
                ReferencedContainer = "container:ScriptWorker.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "B15A76B81E9558EF00AEABA3"
+               BuildableName = "swiftscript"
+               BlueprintName = "swiftscript"
+               ReferencedContainer = "container:ScriptWorker.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
