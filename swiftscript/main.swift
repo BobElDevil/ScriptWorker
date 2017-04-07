@@ -45,16 +45,16 @@ func setup(file: URL, withAdditionalFiles additionalFiles: [URL], searchPaths: [
 
     let workingDirectory = URL(fileURLWithPath: String(cString: cstring))
 
-    let swiftFiles = Preprocessor.swiftURLs(for: additionalFiles)
+    let swiftFiles = SwiftScript.swiftURLs(for: additionalFiles)
 
-    let (mainFile, compiledFiles) = Preprocessor.setup(workingDirectory: workingDirectory, for: file, with: swiftFiles)
+    let (mainFile, compiledFiles) = SwiftScript.setup(workingDirectory: workingDirectory, for: file, with: swiftFiles)
 
     let process = Process()
     process.launchPath = "/usr/bin/xcrun"
 
     let executableURL = workingDirectory.appendingPathComponent(file.deletingPathExtension().lastPathComponent)
 
-    let args = ["swiftc", "-o", executableURL.path] + Preprocessor.swiftArguments(for: mainFile, additionalFiles: compiledFiles, searchPaths: searchPaths)
+    let args = ["swiftc", "-o", executableURL.path] + SwiftScript.swiftArguments(for: mainFile, additionalFiles: compiledFiles, searchPaths: searchPaths)
     process.arguments = args
     process.launch()
     process.waitUntilExit()
@@ -73,12 +73,12 @@ let remainingArgs = CommandLine.arguments.suffix(from: 2)
 
 let scriptDir = scriptURL.deletingLastPathComponent()
 
-let lines = Preprocessor.readLines(from: scriptURL)
-let (additionalFiles, searchPaths) = Preprocessor.filesAndFrameworks(for: lines, withDir: scriptDir)
+let lines = SwiftScript.readLines(from: scriptURL)
+let (additionalFiles, searchPaths) = SwiftScript.filesAndFrameworks(for: lines, withDir: scriptDir)
 
 if additionalFiles.isEmpty {
     // Just run swift directly instead of compiling the output since there's no additional files
-    let args = Preprocessor.swiftArguments(for: scriptURL, additionalFiles: additionalFiles, searchPaths: searchPaths)
+    let args = SwiftScript.swiftArguments(for: scriptURL, additionalFiles: additionalFiles, searchPaths: searchPaths)
     runExec(task: "/usr/bin/xcrun", args: ["swift"] + args + remainingArgs)
 } else {
     // Run swift compiler, then exec the resulting binary

@@ -1,5 +1,5 @@
 //
-//  Preprocessor.swift
+//  SwiftScript.swift
 //  ScriptWorker
 //
 //  Created by Stephen Marquis on 4/5/17.
@@ -9,7 +9,7 @@
 import Foundation
 
 // Simple container class so we can compile this into a unit test bundle
-class Preprocessor {
+class SwiftScript {
     private enum LineType {
         case script(URL)
         case framework(URL)

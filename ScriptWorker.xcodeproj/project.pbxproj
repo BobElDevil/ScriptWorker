@@ -19,9 +19,9 @@
 		AA514CE31D69521800D563F2 /* ScriptWorker.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA514C981D6900BE00D563F2 /* ScriptWorker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B15A76BC1E9558EF00AEABA3 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15A76BB1E9558EF00AEABA3 /* main.swift */; };
 		B15A76D31E958DA000AEABA3 /* swiftscript in Resources */ = {isa = PBXBuildFile; fileRef = B15A76B91E9558EF00AEABA3 /* swiftscript */; };
-		B15A76D51E95949700AEABA3 /* Preprocessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15A76D41E95949700AEABA3 /* Preprocessor.swift */; };
+		B15A76D51E95949700AEABA3 /* SwiftScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15A76D41E95949700AEABA3 /* SwiftScript.swift */; };
 		B15A76DD1E959C9A00AEABA3 /* swiftscriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15A76DC1E959C9A00AEABA3 /* swiftscriptTests.swift */; };
-		B15A76E21E959CA400AEABA3 /* Preprocessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15A76D41E95949700AEABA3 /* Preprocessor.swift */; };
+		B15A76E21E959CA400AEABA3 /* SwiftScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15A76D41E95949700AEABA3 /* SwiftScript.swift */; };
 		B15A76E41E971C1B00AEABA3 /* TestData in Resources */ = {isa = PBXBuildFile; fileRef = B15A76E31E971C1B00AEABA3 /* TestData */; };
 		B19D61381D93329C008BF65D /* trap.swift in Sources */ = {isa = PBXBuildFile; fileRef = B19D61371D93329C008BF65D /* trap.swift */; };
 		B1D5BD551DF2219100E93D97 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1D5BD541DF2219100E93D97 /* main.swift */; };
@@ -98,7 +98,7 @@
 		AA514CDF1D69401700D563F2 /* ScriptWorker+Commands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ScriptWorker+Commands.swift"; sourceTree = "<group>"; };
 		B15A76B91E9558EF00AEABA3 /* swiftscript */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = swiftscript; sourceTree = BUILT_PRODUCTS_DIR; };
 		B15A76BB1E9558EF00AEABA3 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		B15A76D41E95949700AEABA3 /* Preprocessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Preprocessor.swift; sourceTree = "<group>"; };
+		B15A76D41E95949700AEABA3 /* SwiftScript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftScript.swift; sourceTree = "<group>"; };
 		B15A76DA1E959C9A00AEABA3 /* swiftscriptTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = swiftscriptTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B15A76DC1E959C9A00AEABA3 /* swiftscriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = swiftscriptTests.swift; sourceTree = "<group>"; };
 		B15A76DE1E959C9A00AEABA3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -218,7 +218,7 @@
 			isa = PBXGroup;
 			children = (
 				B15A76BB1E9558EF00AEABA3 /* main.swift */,
-				B15A76D41E95949700AEABA3 /* Preprocessor.swift */,
+				B15A76D41E95949700AEABA3 /* SwiftScript.swift */,
 			);
 			path = swiftscript;
 			sourceTree = "<group>";
@@ -489,7 +489,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B15A76D51E95949700AEABA3 /* Preprocessor.swift in Sources */,
+				B15A76D51E95949700AEABA3 /* SwiftScript.swift in Sources */,
 				B15A76BC1E9558EF00AEABA3 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -498,7 +498,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B15A76E21E959CA400AEABA3 /* Preprocessor.swift in Sources */,
+				B15A76E21E959CA400AEABA3 /* SwiftScript.swift in Sources */,
 				B15A76DD1E959C9A00AEABA3 /* swiftscriptTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

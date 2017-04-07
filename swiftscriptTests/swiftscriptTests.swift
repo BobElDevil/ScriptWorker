@@ -12,7 +12,7 @@ class swiftscriptTests: XCTestCase {
 
     private func validate(files: [String], searchPaths: [String], inLines lines: [String], file: StaticString = #file, line: UInt = #line) {
         let dir = URL(fileURLWithPath: "/Relative/Prefix")
-        let (scriptsAndDirs, foundSearchPaths) = Preprocessor.filesAndFrameworks(for: lines, withDir: dir)
+        let (scriptsAndDirs, foundSearchPaths) = SwiftScript.filesAndFrameworks(for: lines, withDir: dir)
         XCTAssertEqual(scriptsAndDirs.map{ $0.path }, files, file: file, line: line)
         XCTAssertEqual(foundSearchPaths.map{ $0.path }, searchPaths, file: file, line: line)
     }
@@ -49,14 +49,14 @@ class swiftscriptTests: XCTestCase {
     }
 
     func testCompilerArgGeneration() {
-        let args = Preprocessor.swiftArguments(for: URL(fileURLWithPath: "/my/script.swift"), additionalFiles: [URL(fileURLWithPath:"/my/localdep.swift")], searchPaths: [URL(fileURLWithPath: "/Library/Frameworks")])
+        let args = SwiftScript.swiftArguments(for: URL(fileURLWithPath: "/my/script.swift"), additionalFiles: [URL(fileURLWithPath:"/my/localdep.swift")], searchPaths: [URL(fileURLWithPath: "/Library/Frameworks")])
         XCTAssertEqual(args, ["-F", "/Library/Frameworks", "/my/script.swift", "/my/localdep.swift"])
     }
 
     func testSwiftURLGenerationAndDirectorySetup() {
         let testResourceURL = Bundle(for: type(of: self)).url(forResource: "TestData", withExtension: nil)!
-        let (files, _) = Preprocessor.filesAndFrameworks(for: ["//!swiftscript dependency.swift", "//!swiftscript subdep"], withDir: testResourceURL)
-        let fileURLs = Preprocessor.swiftURLs(for: files)
+        let (files, _) = SwiftScript.filesAndFrameworks(for: ["//!swiftscript dependency.swift", "//!swiftscript subdep"], withDir: testResourceURL)
+        let fileURLs = SwiftScript.swiftURLs(for: files)
         XCTAssertEqual(fileURLs, ["dependency.swift", "subdep/subdependency1.swift", "subdep/subdependency2.swift"].map{testResourceURL.appendingPathComponent($0)})
 
         let scriptURL = testResourceURL.appendingPathComponent("script.swift")
@@ -65,7 +65,7 @@ class swiftscriptTests: XCTestCase {
         let _ = try? FileManager.default.removeItem(at: workingDirectory)
         try! FileManager.default.createDirectory(at: workingDirectory, withIntermediateDirectories: false, attributes: nil)
 
-        let (main, additional) = Preprocessor.setup(workingDirectory: workingDirectory, for: scriptURL, with: fileURLs)
+        let (main, additional) = SwiftScript.setup(workingDirectory: workingDirectory, for: scriptURL, with: fileURLs)
         XCTAssertEqual(main, workingDirectory.appendingPathComponent("main.swift"))
         XCTAssertEqual(additional, ["dependency.swift", "subdependency1.swift", "subdependency2.swift"].map{workingDirectory.appendingPathComponent($0)})
     }
