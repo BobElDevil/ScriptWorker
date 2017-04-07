@@ -22,6 +22,7 @@
 		B15A76D51E95949700AEABA3 /* Preprocessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15A76D41E95949700AEABA3 /* Preprocessor.swift */; };
 		B15A76DD1E959C9A00AEABA3 /* swiftscriptTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15A76DC1E959C9A00AEABA3 /* swiftscriptTests.swift */; };
 		B15A76E21E959CA400AEABA3 /* Preprocessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15A76D41E95949700AEABA3 /* Preprocessor.swift */; };
+		B15A76E41E971C1B00AEABA3 /* TestData in Resources */ = {isa = PBXBuildFile; fileRef = B15A76E31E971C1B00AEABA3 /* TestData */; };
 		B19D61381D93329C008BF65D /* trap.swift in Sources */ = {isa = PBXBuildFile; fileRef = B19D61371D93329C008BF65D /* trap.swift */; };
 		B1D5BD551DF2219100E93D97 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1D5BD541DF2219100E93D97 /* main.swift */; };
 		B1D5BD5B1DF2264700E93D97 /* ProcessParentWatcher in Resources */ = {isa = PBXBuildFile; fileRef = B1D5BD521DF2219000E93D97 /* ProcessParentWatcher */; };
@@ -101,6 +102,7 @@
 		B15A76DA1E959C9A00AEABA3 /* swiftscriptTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = swiftscriptTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B15A76DC1E959C9A00AEABA3 /* swiftscriptTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = swiftscriptTests.swift; sourceTree = "<group>"; };
 		B15A76DE1E959C9A00AEABA3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B15A76E31E971C1B00AEABA3 /* TestData */ = {isa = PBXFileReference; lastKnownFileType = folder; path = TestData; sourceTree = "<group>"; };
 		B19D61371D93329C008BF65D /* trap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = trap.swift; sourceTree = "<group>"; };
 		B1D5BD521DF2219000E93D97 /* ProcessParentWatcher */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ProcessParentWatcher; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1D5BD541DF2219100E93D97 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
@@ -224,6 +226,7 @@
 		B15A76DB1E959C9A00AEABA3 /* swiftscriptTests */ = {
 			isa = PBXGroup;
 			children = (
+				B15A76E31E971C1B00AEABA3 /* TestData */,
 				B15A76DC1E959C9A00AEABA3 /* swiftscriptTests.swift */,
 				B15A76DE1E959C9A00AEABA3 /* Info.plist */,
 			);
@@ -446,6 +449,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B15A76E41E971C1B00AEABA3 /* TestData in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -836,6 +840,7 @@
 				B15A76BE1E9558EF00AEABA3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B15A76DF1E959C9A00AEABA3 /* Build configuration list for PBXNativeTarget "swiftscriptTests" */ = {
 			isa = XCConfigurationList;
@@ -844,6 +849,7 @@
 				B15A76E11E959C9A00AEABA3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B1D5BD581DF2219100E93D97 /* Build configuration list for PBXNativeTarget "ProcessParentWatcher" */ = {
 			isa = XCConfigurationList;

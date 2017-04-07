@@ -98,4 +98,39 @@ class Preprocessor {
         
         return args
     }
+
+    class func swiftURLs(for additionalFiles: [String]) -> [URL] {
+        let fileManager = FileManager.default
+        let swiftURLs = additionalFiles.map{ URL(fileURLWithPath: $0) }.flatMap { fileOrDirectory -> [URL] in
+            var isDirectory = ObjCBool(booleanLiteral: false)
+            guard fileManager.fileExists(atPath: fileOrDirectory.path, isDirectory: &isDirectory) else {
+                print("Could not find additional file \(fileOrDirectory.path) to compile")
+                exit(1)
+            }
+
+            if isDirectory.boolValue {
+                return try! fileManager.contentsOfDirectory(at: fileOrDirectory, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+                    .filter { $0.pathExtension == "swift" }
+            } else {
+                return [fileOrDirectory]
+            }
+        }
+        return swiftURLs
+    }
+
+    // Returns the destination urls of the script and additional swift files
+    class func setup(workingDirectory: URL, for script: URL, with swiftURLs: [URL]) -> (URL, [URL]) {
+
+        let fileManager = FileManager.default
+        let destinations = swiftURLs.map { workingDirectory.appendingPathComponent($0.lastPathComponent) }
+        let scriptDestination = workingDirectory.appendingPathComponent("main.swift")
+
+        zip(swiftURLs, destinations).forEach { source, destination in
+            try! fileManager.copyItem(at: source, to: destination)
+        }
+
+        try! fileManager.copyItem(at: script, to: scriptDestination)
+
+        return (scriptDestination, destinations)
+    }
 }
