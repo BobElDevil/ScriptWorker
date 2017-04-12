@@ -14,80 +14,91 @@ import Foundation
  Actions suffixed with '_safe' throw any encountered errors, in case you want to handle the error without program failure.
 */
 extension ScriptWorker {
-    /// Remove the item pointed to by path. If 'force' is true, it ignores any errors
-    public func remove() {
+    /// Remove the specified item. If item is nil, remove the path currently represented by the receiver. item defaults to nil.
+    public func remove(item: String? = nil) {
         exitOnError {
-            try remove_safe()
+            try remove_safe(item: item)
         }
     }
 
-    public func remove_safe() throws {
-        log(action: "Removing \(path)")
-        try fileManager.removeItem(at: url)
+    public func remove_safe(item: String? = nil) throws {
+        log(action: "Removing \(path(item: item))")
+        try fileManager.removeItem(at: url(item: item))
     }
 
-    /// Create a directory at path.
-    public func makeDirectory(withIntermediates intermediates: Bool = false) {
+    /// Create a directory. If item is nil, creates directory at the path currently represented by the reciever. item defaults to nil
+    public func makeDirectory(at item: String? = nil, withIntermediates intermediates: Bool = false) {
         exitOnError {
-            try makeDirectory_safe(withIntermediates: intermediates)
+            try makeDirectory_safe(at: item, withIntermediates: intermediates)
         }
     }
 
-    public func makeDirectory_safe(withIntermediates intermediates: Bool = false) throws {
-        log(action: "Creating directory \(path)")
-        try fileManager.createDirectory(at: url, withIntermediateDirectories: intermediates, attributes: nil)
+    public func makeDirectory_safe(at item: String? = nil, withIntermediates intermediates: Bool = false) throws {
+        log(action: "Creating directory \(path(item: item))")
+        try fileManager.createDirectory(at: url(item: item), withIntermediateDirectories: intermediates, attributes: nil)
     }
 
-    /// Copy the item at path to the location defined by 'toPath'. toPath can be absolute or relative
-    public func copy(to toPath: String) {
+    /// Copy item at path to the location defined by 'toPath'. toPath can be absolute or relative
+    /// If item is nil, copies the directory represented by the receiver.
+    /// If 'toPath' alreday exists and is a directory, it will copy the item into that directory with the original name.
+    /// Otherwise it copies to the destination with the destination name
+    public func copy(item: String? = nil, to toPath: String) {
         exitOnError {
-            try copy_safe(to: toPath)
+            try copy_safe(item: item, to: toPath)
         }
     }
 
-    public func copy_safe(to toPath: String) throws {
-        let destinationURL: URL
-        if (toPath as NSString).isAbsolutePath {
-            destinationURL = URL(fileURLWithPath: toPath)
-        } else {
-            destinationURL = url.appendingPathComponent(toPath)
-        }
-        log(action: "Copying \(path) to \(destinationURL.path)")
-        try fileManager.copyItem(at: url, to: destinationURL)
+    public func copy_safe(item: String? = nil, to toPath: String) throws {
+        let destinationURL = destinationURLFor(item: item, path: toPath)
+        log(action: "Copying \(path(item: item)) to \(destinationURL.path)")
+        try fileManager.copyItem(at: url(item: item), to: destinationURL)
     }
 
     /// Move the item at path to the location defined by 'toPath'. toPath can be absolute or relative
-    public func move(to toPath: String) {
+    /// If item is nil, moves the directory represented by the receiver.
+    /// If 'toPath' already exists and is a directory, it will move the item into that directory with the original name.
+    /// Otherwise it moves to the destination with the destination name
+    public func move(item: String? = nil, to toPath: String) {
         exitOnError {
-            try move_safe(to: toPath)
+            try move_safe(item: item, to: toPath)
         }
     }
 
-    public func move_safe(to toPath: String) throws {
-        let destinationURL: URL
-        if (toPath as NSString).isAbsolutePath {
-            destinationURL = URL(fileURLWithPath: toPath)
+    public func move_safe(item: String? = nil, to toPath: String) throws {
+        let destinationURL = destinationURLFor(item: item, path: toPath)
+        log(action: "Moving \(path(item: item)) to \(destinationURL.path)")
+        try fileManager.moveItem(at: url(item: item), to: destinationURL)
+    }
+
+    private func destinationURLFor(item: String?, path: String) -> URL {
+        var destinationURL: URL
+        if (path as NSString).isAbsolutePath {
+            destinationURL = URL(fileURLWithPath: path)
         } else {
-            destinationURL = url.appendingPathComponent(toPath)
+            destinationURL = url().appendingPathComponent(path)
         }
-        log(action: "Moving \(path) to \(destinationURL.path)")
-        try fileManager.moveItem(at: url, to: destinationURL)
+        let (exists, isDir) = fileStatus(for: destinationURL.path)
+        print("Exists: \(exists), isDir: \(isDir) for \(destinationURL.path)")
+        if exists && isDir {
+            destinationURL.appendPathComponent(item ?? url().lastPathComponent)
+        }
+        return destinationURL
     }
 
     /// Create a symlink at path to the location defined by 'toPath'. toPath can be absolute or relative
-    public func symlink(to toPath: String) {
+    public func symlink(item: String, to toPath: String) {
         exitOnError {
-            try symlink_safe(to: toPath)
+            try symlink_safe(item: item, to: toPath)
         }
     }
 
-    public func symlink_safe(to toPath: String) throws {
-        log(action: "Creating symlink from \(path) to \(toPath)")
+    public func symlink_safe(item: String, to toPath: String) throws {
+        log(action: "Creating symlink from \(path(item: item)) to \(toPath)")
         if (toPath as NSString).isAbsolutePath {
-            try fileManager.createSymbolicLink(at: url, withDestinationURL: URL(fileURLWithPath: toPath))
+            try fileManager.createSymbolicLink(at: url(item: item), withDestinationURL: URL(fileURLWithPath: toPath))
         } else {
             // Use path based API to make sure it ends up relative
-            try fileManager.createSymbolicLink(atPath: url.path, withDestinationPath: toPath)
+            try fileManager.createSymbolicLink(atPath: path(item: item), withDestinationPath: toPath)
         }
     }
 }

@@ -21,23 +21,15 @@ script.makeDirectory()
 // Part one, create the files
 script.push("DirOne")
 script.makeDirectory()
-
 for file in ["alpha", "beta", "charlie", "delta", "echo"] {
-    script.push(file)
-    script.writeString("This file is \(file)")
-    script.pop()
+    script.writeString("This file is \(file)", to: file)
 }
 script.pop()
 
-script.push("linkList.txt")
-script.writeLines(["beta", "echo"])
-script.pop()
-
+script.writeLines(["beta", "echo"], to: "linkList.txt")
 
 // Part two, create the symlinks
-script.push("linkList.txt")
-let entries = script.readLines()
-script.pop()
+let entries = script.readLines(file: "linkList.txt")
 
 var readScript = script
 readScript.push("DirOne")
@@ -46,14 +38,6 @@ script.push("DirTwo")
 script.makeDirectory()
 
 for entry in entries {
-    readScript.push(entry)
-    defer { readScript.pop() }
-
-    guard readScript.exists else {
-        continue
-    }
-
-    script.push(entry)
-    script.symlink(to: script.relative(to: readScript))
-    script.pop()
+    let destPath = readScript.path(item: entry)
+    script.symlink(item: entry, to: script.relative(to: destPath))
 }

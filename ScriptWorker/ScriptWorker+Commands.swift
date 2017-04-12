@@ -76,10 +76,10 @@ extension ScriptWorker {
 
     private func _launch(command: String, arguments: [String], environment: [String: String], dataHandler: DataHandler? = nil, terminationHandler: TerminationHandler? = nil) -> Process {
         let task = Process()
-        if isDirectory {
-            task.currentDirectoryPath = path
+        if directoryExists() {
+            task.currentDirectoryPath = path()
         } else {
-            task.currentDirectoryPath = url.deletingLastPathComponent().path
+            task.currentDirectoryPath = url().deletingLastPathComponent().path
         }
 
         task.launchPath = "/usr/bin/env" // Use env so we can rely on items in $PATH
