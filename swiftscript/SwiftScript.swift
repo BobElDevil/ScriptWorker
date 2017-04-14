@@ -89,7 +89,7 @@ class SwiftScript {
 
     class func swiftArguments(for file: URL, additionalFiles: [URL], searchPaths: [URL]) -> [String] {
         var args: [String] = []
-        args += searchPaths.flatMap { ["-F", $0.path] }
+        args += searchPaths.filter { FileManager.default.fileExists(atPath: $0.path) }.flatMap { ["-F", $0.path] }
         args.append(file.path)
         args += additionalFiles.map { $0.path }
         
