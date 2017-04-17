@@ -25,11 +25,20 @@ extension ScriptWorker {
         return status.exists && !status.directory
     }
 
+    public static func fileExists(_ path: String) -> Bool {
+        return applyScriptWorker(path: path) { $0.fileExists($1) }
+    }
+
     /// Indicates whether the given item is a directory. If item is nil, returns whether the current path of the reciever is a directory
     public func directoryExists(_ dir: String? = nil) -> Bool {
         let status = fileStatus(for: path(item: dir))
         return status.exists && status.directory
     }
+
+    public static func directoryExists(_ path: String) -> Bool {
+        return applyScriptWorker(path: path) { $0.directoryExists($1) }
+    }
+
 
     /// Indicates whether the given file is a symbolic link
     public func fileIsSymlink(_ file: String) -> Bool {
@@ -40,10 +49,21 @@ extension ScriptWorker {
         return false
     }
 
+    public static func fileIsSymlink(_ path: String) -> Bool {
+        return applyScriptWorker(path: path) { $0.fileIsSymlink($1) }
+    }
+
     // Helper for figuring out attributes.
     func fileStatus(for itemPath: String) -> (exists: Bool, directory: Bool) {
         var isDirObj: ObjCBool = false
         let exists = fileManager.fileExists(atPath: itemPath, isDirectory: &isDirObj)
         return (exists, isDirObj.boolValue)
+    }
+
+    // Helper for applying full path based functions
+    static func applyScriptWorker<T>(path: String, _ closure: (ScriptWorker, String) throws -> T) rethrows -> T {
+        let nsStr = path as NSString
+        let worker = ScriptWorker(path: nsStr.deletingLastPathComponent)
+        return try closure(worker, nsStr.lastPathComponent)
     }
 }
