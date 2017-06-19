@@ -17,6 +17,7 @@ public class ScriptTask {
     private var arguments: [String] = []
     private var environment: [String: String] = [:]
     private var dataHandlers: [DataHandler] = []
+    private var nonPipedDataHandlers: [DataHandler] = []
     private var terminationHandler: TerminationHandler? = nil
     private var exitOnFailure: Bool = false
 
@@ -46,7 +47,7 @@ public class ScriptTask {
     private var isPipeDestination: Bool = false
 
     // Pipes all output from the receiver to the destination task.
-    // Any output captured (via `output` or `runForOutput`) will be from the destination, not the receiver
+    // Any output captured will be from the destination, not the receiver, unless the 'ignorePipe' option was supplied
     // If a previous 'pipe' call has been made, it will recursively call pipe on the previous destination, for ease 
     // of setting up pipe chains
     //
@@ -62,20 +63,25 @@ public class ScriptTask {
         return self
     }
 
+
     // MARK: Data handling
-    @discardableResult public func output(to handler: @escaping DataHandler) -> ScriptTask {
-        self.dataHandlers.append(handler)
+    @discardableResult public func output(ignorePipe: Bool = false, to handler: @escaping DataHandler) -> ScriptTask {
+        if ignorePipe {
+            self.nonPipedDataHandlers.append(handler)
+        } else {
+            self.dataHandlers.append(handler)
+        }
         return self
     }
 
-    @discardableResult public func output(toHandle: FileHandle) -> ScriptTask {
-        return self._output(toHandle: toHandle, forPiping: false)
+    @discardableResult public func output(ignorePipe: Bool = false, toHandle: FileHandle) -> ScriptTask {
+        return self.output(ignorePipe: ignorePipe, to: handler(toHandle: toHandle, forPiping: false))
     }
 
-    @discardableResult private func _output(toHandle: FileHandle, forPiping: Bool) -> ScriptTask {
+    @discardableResult private func handler(toHandle: FileHandle, forPiping: Bool) -> DataHandler {
         // Write both stderr and stdout to the target handle
         var otherIsDone: Bool = false // Make sure we wait for both streams to send an empty data
-        return self.output { [weak self] data, _ in
+        return { [weak self] data, _ in
             if data.isEmpty {
                 if otherIsDone {
                     toHandle.closeFile() // Sends an empty data for us
@@ -95,14 +101,14 @@ public class ScriptTask {
     }
 
     @discardableResult private func _outputToParent() -> ScriptTask {
-        return self.output(to: { data, isStdOut in
+        return self.output { data, isStdOut in
             guard !data.isEmpty else { return }
             if isStdOut {
                 FileHandle.standardOutput.write(data)
             } else {
                 FileHandle.standardError.write(data)
             }
-        })
+        }
     }
 
     // MARK: Running
@@ -188,7 +194,7 @@ public class ScriptTask {
             // Pipe all output to the destination
             destinationTask.dataHandlers += self.dataHandlers
             self.dataHandlers.removeAll()
-            self._output(toHandle: destinationTask.stdinPipe.fileHandleForWriting, forPiping: true)
+            self.output(to: handler(toHandle: destinationTask.stdinPipe.fileHandleForWriting, forPiping: true))
         }
 
         let outComp = setup(pipe: stdOutPipe, stdout: true)
@@ -253,6 +259,7 @@ public class ScriptTask {
 
     private func notify(_ data: Data, stdout: Bool) {
         dataHandlers.forEach { $0(data, stdout) }
+        nonPipedDataHandlers.forEach { $0(data, stdout) }
     }
 
     // MARK: Termination/Launch Handling
