@@ -29,12 +29,16 @@ public struct ScriptWorker {
     }
 
     /// Prints to stdout any actions the worker takes. Defaults to true
-    public var logActions: Bool = true
+    public static var logActions: Bool = true
 
-    func log(action: String) {
+    static func log(action: String) {
         if logActions {
             print("% \(action)")
         }
+    }
+
+    func log(action: String) {
+        ScriptWorker.log(action: action)
     }
 
     private var url: URL

@@ -24,6 +24,8 @@
 		B15A76E21E959CA400AEABA3 /* SwiftScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15A76D41E95949700AEABA3 /* SwiftScript.swift */; };
 		B15A76E41E971C1B00AEABA3 /* TestData in Resources */ = {isa = PBXBuildFile; fileRef = B15A76E31E971C1B00AEABA3 /* TestData */; };
 		B15EB26C1EF4B65C009C4E5B /* ScriptTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15EB26B1EF4B65B009C4E5B /* ScriptTask.swift */; };
+		B15EB26F1EF87D38009C4E5B /* PipeWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = B15EB26D1EF87D38009C4E5B /* PipeWriter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B15EB2701EF87D38009C4E5B /* PipeWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = B15EB26E1EF87D38009C4E5B /* PipeWriter.m */; };
 		B19D61381D93329C008BF65D /* trap.swift in Sources */ = {isa = PBXBuildFile; fileRef = B19D61371D93329C008BF65D /* trap.swift */; };
 		B1D5BD551DF2219100E93D97 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1D5BD541DF2219100E93D97 /* main.swift */; };
 		B1D5BD5B1DF2264700E93D97 /* ProcessParentWatcher in Resources */ = {isa = PBXBuildFile; fileRef = B1D5BD521DF2219000E93D97 /* ProcessParentWatcher */; };
@@ -105,6 +107,8 @@
 		B15A76DE1E959C9A00AEABA3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B15A76E31E971C1B00AEABA3 /* TestData */ = {isa = PBXFileReference; lastKnownFileType = folder; path = TestData; sourceTree = "<group>"; };
 		B15EB26B1EF4B65B009C4E5B /* ScriptTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScriptTask.swift; sourceTree = "<group>"; };
+		B15EB26D1EF87D38009C4E5B /* PipeWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PipeWriter.h; sourceTree = "<group>"; };
+		B15EB26E1EF87D38009C4E5B /* PipeWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PipeWriter.m; sourceTree = "<group>"; };
 		B19D61371D93329C008BF65D /* trap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = trap.swift; sourceTree = "<group>"; };
 		B1D5BD521DF2219000E93D97 /* ProcessParentWatcher */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ProcessParentWatcher; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1D5BD541DF2219100E93D97 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
@@ -195,6 +199,8 @@
 				AA514CD91D693E8C00D563F2 /* ScriptWorker+Attributes.swift */,
 				AA514CDB1D693F2F00D563F2 /* ScriptWorker+Actions.swift */,
 				B15EB26B1EF4B65B009C4E5B /* ScriptTask.swift */,
+				B15EB26D1EF87D38009C4E5B /* PipeWriter.h */,
+				B15EB26E1EF87D38009C4E5B /* PipeWriter.m */,
 			);
 			path = ScriptWorker;
 			sourceTree = "<group>";
@@ -251,6 +257,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B15EB26F1EF87D38009C4E5B /* PipeWriter.h in Headers */,
 				AA514C9C1D6900BE00D563F2 /* ScriptWorker.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -377,7 +384,7 @@
 				TargetAttributes = {
 					AA514C971D6900BE00D563F2 = {
 						CreatedOnToolsVersion = 7.3.1;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 0830;
 					};
 					AA514CA11D6900BE00D563F2 = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -468,6 +475,7 @@
 				AA514CDA1D693E8C00D563F2 /* ScriptWorker+Attributes.swift in Sources */,
 				AA514CE01D69401700D563F2 /* ScriptWorker+Commands.swift in Sources */,
 				AA514CDE1D693FB700D563F2 /* ScriptWorker+IO.swift in Sources */,
+				B15EB2701EF87D38009C4E5B /* PipeWriter.m in Sources */,
 				AA514CDC1D693F2F00D563F2 /* ScriptWorker+Actions.swift in Sources */,
 				B15EB26C1EF4B65C009C4E5B /* ScriptTask.swift in Sources */,
 			);

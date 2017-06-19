@@ -47,12 +47,18 @@ public class ScriptTask {
 
     // Pipes all output from the receiver to the destination task.
     // Any output captured (via `output` or `runForOutput`) will be from the destination, not the receiver
+    // If a previous 'pipe' call has been made, it will recursively call pipe on the previous destination, for ease 
+    // of setting up pipe chains
     //
     // Note: Once a pipe is set up, only the source task must be started via a `run` method. If called on
     // the destination task, the process will exit with an error
     @discardableResult public func pipe(to: ScriptTask) -> ScriptTask {
-        self.destinationTask = to
-        to.isPipeDestination = true
+        if let destinationTask = destinationTask {
+            destinationTask.pipe(to: to)
+        } else {
+            self.destinationTask = to
+            to.isPipeDestination = true
+        }
         return self
     }
 
@@ -63,9 +69,13 @@ public class ScriptTask {
     }
 
     @discardableResult public func output(toHandle: FileHandle) -> ScriptTask {
+        return self._output(toHandle: toHandle, forPiping: false)
+    }
+
+    @discardableResult private func _output(toHandle: FileHandle, forPiping: Bool) -> ScriptTask {
         // Write both stderr and stdout to the target handle
         var otherIsDone: Bool = false // Make sure we wait for both streams to send an empty data
-        return self.output { data, _ in
+        return self.output { [weak self] data, _ in
             if data.isEmpty {
                 if otherIsDone {
                     toHandle.closeFile() // Sends an empty data for us
@@ -73,12 +83,18 @@ public class ScriptTask {
                     otherIsDone = true
                 }
             } else {
-                toHandle.write(data)
+                if let pid = self?.process.processIdentifier, forPiping {
+                    forwardBrokenPipeToChild(pid) {
+                        toHandle.write(data)
+                    }
+                } else {
+                    toHandle.write(data)
+                }
             }
         }
     }
 
-    @discardableResult private func outputToParent() -> ScriptTask {
+    @discardableResult private func _outputToParent() -> ScriptTask {
         return self.output(to: { data, isStdOut in
             guard !data.isEmpty else { return }
             if isStdOut {
@@ -95,15 +111,14 @@ public class ScriptTask {
     // Returns the status code of the process
     @discardableResult public func run(printOutput: Bool = true) -> Int {
         if printOutput {
-            self.outputToParent()
+            self._outputToParent()
         }
         var status = 0
         addTerminationHandler {
             status = $0
         }
 
-        // TODO: Launch piped task correctly
-        self._launch(sync: true)
+        self._launch(sync: true, pipeLaunch: false)
         return status
     }
 
@@ -124,26 +139,38 @@ public class ScriptTask {
     }
 
     // Run the task asynchronously. Status code is sent to the completion block. 
-    // By default does not send output anywhere. If interested in the output, use the various `output` variants
-    public func runAsync(_ completion: ((Int) -> Void)? = nil) {
-        completion?(0)
+    // By default does not send output anywhere. If interested in the output, use the various `output` variants,
+    // or pass 'true' to printOutput
+    public func runAsync(printOutput: Bool = false, _ completion: TerminationHandler? = nil) {
+        if printOutput {
+            self._outputToParent()
+        }
+        if let completion = completion {
+            addTerminationHandler(completion)
+        }
+        self._launch(sync: false, pipeLaunch: false)
     }
 
     private var didRun: Bool = false
-    private lazy var task = Process()
+    private lazy var process = Process()
     private lazy var stdOutPipe = Pipe()
     private lazy var stdErrPipe = Pipe()
     private lazy var stdinPipe = Pipe()
-    private func _launch(sync: Bool) {
+    private func _launch(sync: Bool, pipeLaunch: Bool) {
         guard !didRun else {
             exitMsg("'\(self.command)' attempted to run multiple times!")
         }
-        guard !isPipeDestination else {
+        guard !isPipeDestination || pipeLaunch else {
             exitMsg("'\(self.command)' attempted to run when the target of a pipe! Call `run` on the source instead")
         }
+
+        if !pipeLaunch {
+            ScriptWorker.log(action: "Running '\(commandDescription)'")
+        }
+        
         didRun = true
-        task.currentDirectoryPath = workingDirectory
-        task.launchPath = "/usr/bin/env" // Use env so we can rely on $PATH
+        process.currentDirectoryPath = workingDirectory
+        process.launchPath = "/usr/bin/env" // Use env so we can rely on $PATH
 
         // Since we're using 'env', we just add any environment variables to the arguments
         let envArguments = environment.map { key, value in
@@ -151,17 +178,17 @@ public class ScriptTask {
         }
 
         // Unbuffer IO so we can get it right away
-        task.arguments = ["NSUnbufferedIO=YES"] + envArguments + [command] + arguments
+        process.arguments = ["NSUnbufferedIO=YES"] + envArguments + [command] + arguments
 
-        task.standardOutput = stdOutPipe
-        task.standardError = stdErrPipe
-        task.standardInput = stdinPipe
+        process.standardOutput = stdOutPipe
+        process.standardError = stdErrPipe
+        process.standardInput = stdinPipe
 
         if let destinationTask = destinationTask {
             // Pipe all output to the destination
             destinationTask.dataHandlers += self.dataHandlers
             self.dataHandlers.removeAll()
-            self.output(toHandle: destinationTask.stdinPipe.fileHandleForWriting)
+            self._output(toHandle: destinationTask.stdinPipe.fileHandleForWriting, forPiping: true)
         }
 
         let outComp = setup(pipe: stdOutPipe, stdout: true)
@@ -179,16 +206,25 @@ public class ScriptTask {
             }
         }
 
-        task.launch() // Launch before setting up the watcher because it needs the Pid
-        _watch(pid: task.processIdentifier)
+        process.launch() // Launch before setting up the watcher because it needs the Pid
+        _watch(pid: process.processIdentifier)
 
-        // If we're piped, always run ourselves async, and then just forward the launch to the destination task
+        // If we're piped, run the child first with the same sync settings
         if let destinationTask = destinationTask {
             destinationTask.isPipeDestination = false // Clear the flag so it can run now
-            destinationTask._launch(sync: sync)
-        } else if sync {
-            task.waitUntilExit()
+            destinationTask._launch(sync: sync, pipeLaunch: true)
         }
+        if sync {
+            process.waitUntilExit()
+        }
+    }
+
+    private var commandDescription: String {
+        var description = "\(command) \(arguments.joined(separator: " "))"
+        if let destinationTask = destinationTask {
+            description += " | " + destinationTask.commandDescription
+        }
+        return description
     }
 
     private func setup(pipe: Pipe, stdout: Bool) -> ((Void) -> Void)  {
@@ -237,29 +273,28 @@ public class ScriptTask {
     }
 
     private func addTerminationHandler(_ handler: @escaping TerminationHandler) {
-        if let existingHandler = task.terminationHandler {
-            task.terminationHandler = { theTask in
+        if let existingHandler = process.terminationHandler {
+            process.terminationHandler = { theTask in
                 existingHandler(theTask)
                 handler(Int(theTask.terminationStatus))
             }
         } else {
-            task.terminationHandler = { theTask in
+            process.terminationHandler = { theTask in
                 handler(Int(theTask.terminationStatus))
             }
         }
     }
 
     private func setupTraps() {
+        signal(SIGPIPE, SIG_IGN) // We ignore SIGPIPE here, instead we'll catch the broken pipe exception
         let signalsToTrap: [Signal] = [.HUP, .INT, .QUIT, .ABRT, .KILL, .ALRM, .TERM]
         for sig in signalsToTrap {
             trap(signal: sig, action: { theSig in
                 let pids = ScriptTask.childPids
                 for pid in pids {
-                    print("Killing the child")
                     kill(pid, theSig)
                 }
                 signal(theSig, SIG_DFL)
-                raise(theSig)
             })
         }
     }
