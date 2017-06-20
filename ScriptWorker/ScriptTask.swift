@@ -19,40 +19,47 @@ public class ScriptTask {
     private var dataHandlers: [DataHandler] = []
     private var nonPipedDataHandlers: [DataHandler] = []
     private var terminationHandler: TerminationHandler? = nil
-    private var exitOnFailure: Bool = false
+    private var exitFlag: Bool = false
 
-    // MARK: Builder methods
+    /// MARK: Builder methods
+
+    /// Create a ScriptTask object for launching a process with the given name. If no workingDirectory is given, uses
+    /// the current working directory
+    /// Note: This method will rarely need to be used if you're working with ScriptWorker structs. See the `task` method of ScriptWorker
     public init(_ name: String, workingDirectory: String? = nil) {
         self.command = name
         self.workingDirectory = workingDirectory ?? FileManager.default.currentDirectoryPath
     }
 
+    /// Specify arguments for the task. Returns the receiver
     @discardableResult public func args(_ args: [String]) -> ScriptTask {
         self.arguments = args
         return self
     }
 
+    /// Specify environment for the task. Returns the receiver
     @discardableResult public func env(_ env: [String: String]) -> ScriptTask {
         self.environment = env
         return self
     }
 
-    @discardableResult public func exitOnFailure(_ exitOnFailure: Bool = true) -> ScriptTask {
-        self.exitOnFailure = exitOnFailure
+    /// Exit the main program when this task ends with a status code != 0. Specify arguments for the task. Returns the receiver
+    @discardableResult public func exitOnFailure() -> ScriptTask {
+        self.exitFlag = true
         return self
     }
 
-    // MARK: Piping
+    /// MARK: Piping
     private var destinationTask: ScriptTask? = nil
     private var isPipeDestination: Bool = false
 
-    // Pipes all output from the receiver to the destination task.
-    // Any output captured will be from the destination, not the receiver, unless the 'ignorePipe' option was supplied
-    // If a previous 'pipe' call has been made, it will recursively call pipe on the previous destination, for ease 
-    // of setting up pipe chains
-    //
-    // Note: Once a pipe is set up, only the source task must be started via a `run` method. If called on
-    // the destination task, the process will exit with an error
+    /// Pipes all output from the receiver to the destination task.
+    /// Any output captured will be from the destination, not the receiver, unless the 'ignorePipe' option was supplied
+    /// If a previous 'pipe' call has been made, it will recursively call pipe on the previous destination, for ease
+    /// of setting up pipe chains
+    ///
+    /// Note: Once a pipe is set up, only the source task must be started via a `run` method. If called on
+    /// the destination task, the process will exit with an error
     @discardableResult public func pipe(to: ScriptTask) -> ScriptTask {
         if let destinationTask = destinationTask {
             destinationTask.pipe(to: to)
@@ -65,7 +72,11 @@ public class ScriptTask {
     }
 
 
-    // MARK: Data handling
+    /// MARK: Data handling
+
+    /// Run the given data handler when task produces output. If a call to 'pipe' has been made, the data sent to the
+    /// handler will be the output of the piped to command, unless 'ignorePipe' is set to true. This allows for easier task piping without nesting output calls, e.g., 
+    /// `script.task("ls").pipe(to: script.task("grep").args([".swift"])).output { // process grep output }`
     @discardableResult public func output(ignorePipe: Bool = false, to handler: @escaping DataHandler) -> ScriptTask {
         if ignorePipe {
             self.nonPipedDataHandlers.append(handler)
@@ -75,6 +86,7 @@ public class ScriptTask {
         return self
     }
 
+    /// Pipe both stdout and stderr to the given FileHandle
     @discardableResult public func output(ignorePipe: Bool = false, toHandle: FileHandle) -> ScriptTask {
         return self.output(ignorePipe: ignorePipe, to: handler(toHandle: toHandle, forPiping: false))
     }
@@ -112,10 +124,10 @@ public class ScriptTask {
         }
     }
 
-    // MARK: Running
+    /// MARK: Running
 
-    // Run the task synchronously. forwards output to the current processes streams if 'printOutput' is true
-    // Returns the status code of the process
+    /// Run the task synchronously. forwards output to the current processes streams if 'printOutput' is true (the default)
+    /// Returns the status code of the process
     @discardableResult public func run(printOutput: Bool = true) -> Int {
         if printOutput {
             self._outputToParent()
@@ -129,6 +141,7 @@ public class ScriptTask {
         return status
     }
 
+    /// Run the task synchronously, returning a tuple of (status, stdout, stderr)
     @discardableResult public func runForOutput() -> (Int, String, String) {
         var outData = Data()
         var errData = Data()
@@ -145,10 +158,9 @@ public class ScriptTask {
         return (status, outString, errString)
     }
 
-    // Run the task asynchronously. Status code is sent to the completion block. 
-    // By default does not send output anywhere. If interested in the output, use the various `output` variants,
-    // or pass 'true' to printOutput
-    public func runAsync(printOutput: Bool = false, _ completion: TerminationHandler? = nil) {
+    /// Run the task asynchronously. Status code is sent to the completion block.
+    /// forwards output to the current process streams if 'printOutput' is true (the default)
+    public func runAsync(printOutput: Bool = true, _ completion: TerminationHandler? = nil) {
         if printOutput {
             self._outputToParent()
         }
@@ -203,7 +215,7 @@ public class ScriptTask {
             outComp()
             errComp()
         }
-        if exitOnFailure {
+        if exitFlag {
             let commandName = self.command
             addTerminationHandler { status in
                 if status != 0 {

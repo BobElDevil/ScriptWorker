@@ -11,6 +11,8 @@ import Foundation
 
 extension ScriptWorker {
 
+    /// Create a ScriptTask object with the given command name. The working directory of the task will be
+    /// set to 'path()' (or the parent directory if the current one doesn't exist)
     public func task(_ command: String) -> ScriptTask {
         let workingDir = directoryExists() ? path() : url().deletingLastPathComponent().path
         return ScriptTask(command, workingDirectory: workingDir)
@@ -22,7 +24,11 @@ extension ScriptWorker {
     ///
     /// Returns a tuple with status, stdout and stderr
     public func launch(commandForOutput command: String, arguments: [String] = [], environment: [String: String] = [:], exitOnFailure: Bool = false) -> (Int, String, String) {
-        return task(command).args(arguments).env(environment).exitOnFailure(exitOnFailure).runForOutput()
+        let ret = task(command).args(arguments).env(environment)
+        if exitOnFailure {
+            ret.exitOnFailure()
+        }
+        return ret.runForOutput()
     }
 
     /// Launches the given command with the working directory set to path (or the parent directory if path is a file). If provided, calls dataHandler with any data from the command. If the bool is true, it came from stdout, otherwise stderr.
@@ -31,13 +37,16 @@ extension ScriptWorker {
     ///
     /// Returns the status.
     @discardableResult public func launch(command: String, arguments: [String] = [], environment: [String: String] = [:], exitOnFailure: Bool = false, dataHandler: ScriptTask.DataHandler? = nil) -> Int {
-        let task = self.task(command).args(arguments).env(environment).exitOnFailure(exitOnFailure)
+        let ret = self.task(command).args(arguments).env(environment)
+        if exitOnFailure {
+            ret.exitOnFailure()
+        }
         let status: Int
         if let providedHandler = dataHandler {
-            task.output(to: providedHandler)
-            status = task.run(printOutput: false)
+            ret.output(to: providedHandler)
+            status = ret.run(printOutput: false)
         } else {
-            status = task.run()
+            status = ret.run()
         }
         return status
     }
@@ -49,6 +58,6 @@ extension ScriptWorker {
         if let dataHandler = dataHandler {
             task.output(to: dataHandler)
         }
-        task.runAsync(terminationHandler)
+        task.runAsync(printOutput: false, terminationHandler)
     }
 }
