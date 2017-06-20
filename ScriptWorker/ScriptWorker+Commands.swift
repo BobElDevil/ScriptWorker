@@ -22,7 +22,7 @@ extension ScriptWorker {
     ///
     /// Returns a tuple with status, stdout and stderr
     public func launch(commandForOutput command: String, arguments: [String] = [], environment: [String: String] = [:], exitOnFailure: Bool = false) -> (Int, String, String) {
-        return task(command).args(arguments).env(environment).exitOnFailure().runForOutput()
+        return task(command).args(arguments).env(environment).exitOnFailure(exitOnFailure).runForOutput()
     }
 
     /// Launches the given command with the working directory set to path (or the parent directory if path is a file). If provided, calls dataHandler with any data from the command. If the bool is true, it came from stdout, otherwise stderr.

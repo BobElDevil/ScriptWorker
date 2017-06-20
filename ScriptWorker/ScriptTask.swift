@@ -59,6 +59,7 @@ public class ScriptTask {
         } else {
             self.destinationTask = to
             to.isPipeDestination = true
+            self.output(ignorePipe: true, to: handler(toHandle: to.stdinPipe.fileHandleForWriting, forPiping: true))
         }
         return self
     }
@@ -194,7 +195,6 @@ public class ScriptTask {
             // Pipe all output to the destination
             destinationTask.dataHandlers += self.dataHandlers
             self.dataHandlers.removeAll()
-            self.output(to: handler(toHandle: destinationTask.stdinPipe.fileHandleForWriting, forPiping: true))
         }
 
         let outComp = setup(pipe: stdOutPipe, stdout: true)
@@ -226,7 +226,11 @@ public class ScriptTask {
     }
 
     private var commandDescription: String {
-        var description = "\(command) \(arguments.joined(separator: " "))"
+        var description = command
+        if !arguments.isEmpty {
+            description += " "
+            description += arguments.joined(separator: " ")
+        }
         if let destinationTask = destinationTask {
             description += " | " + destinationTask.commandDescription
         }
