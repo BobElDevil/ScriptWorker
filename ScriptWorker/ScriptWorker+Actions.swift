@@ -135,7 +135,6 @@ extension ScriptWorker {
             destinationURL = url().appendingPathComponent(path)
         }
         let (exists, isDir) = fileStatus(for: destinationURL.path)
-        print("Exists: \(exists), isDir: \(isDir) for \(destinationURL.path)")
         if exists && isDir {
             destinationURL.appendPathComponent(item ?? url().lastPathComponent)
         }
