@@ -92,7 +92,11 @@ class SwiftScript {
         args += searchPaths.filter { FileManager.default.fileExists(atPath: $0.path) }.flatMap { ["-F", $0.path] }
         args.append(file.path)
         args += additionalFiles.map { $0.path }
-        
+
+        let systemVersion = ProcessInfo().operatingSystemVersion
+        let targetString = "x86_64-apple-macosx\(systemVersion.majorVersion).\(systemVersion.minorVersion)"
+        args += ["-target", targetString]
+
         return args
     }
 
