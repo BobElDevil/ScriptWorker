@@ -23,7 +23,7 @@ class SwiftScript {
                     return nil
                 }
 
-                var path = String(trimmedLine[..<range.upperBound]).trimmingCharacters(in: .whitespaces)
+                var path = String(trimmedLine[range.upperBound...]).trimmingCharacters(in: .whitespaces)
                 path = (path as NSString).expandingTildeInPath
                 let url: URL
                 if (path as NSString).isAbsolutePath {
