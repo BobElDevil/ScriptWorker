@@ -9,4 +9,4 @@
 @import Foundation;
 
 // Need to catch broken pipe NSException, so small objective c shim
-void forwardBrokenPipeToChild(pid_t child, void (^block)());
+void forwardBrokenPipeToChild(pid_t child, void (^block)(void));

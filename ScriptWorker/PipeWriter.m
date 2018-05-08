@@ -8,7 +8,7 @@
 
 #import "PipeWriter.h"
 
-void forwardBrokenPipeToChild(pid_t child, void (^block)()) {
+void forwardBrokenPipeToChild(pid_t child, void (^block)(void)) {
     @try {
         block();
     } @catch(NSException *e) {

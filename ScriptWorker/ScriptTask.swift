@@ -249,7 +249,7 @@ public class ScriptTask {
         return description
     }
 
-    private func setup(pipe: Pipe, stdout: Bool) -> ((Void) -> Void)  {
+    private func setup(pipe: Pipe, stdout: Bool) -> (() -> Void)  {
         let readHandle = pipe.fileHandleForReading
         let semaphore = DispatchSemaphore(value: 1)
 
@@ -260,7 +260,8 @@ public class ScriptTask {
             semaphore.signal()
         }
 
-        return { [weak self] in
+        return {
+            [weak self] in
             // The 'readabilityHandler' for a file handle doesn't get triggered for EOF for whatever reason, so we clear out the readability handler and read the last available data when the task is done.
             semaphore.wait()
             readHandle.readabilityHandler = nil
