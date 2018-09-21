@@ -38,7 +38,7 @@ func runExec(task: String, args: [String], overrideExecutablePath: String? = nil
 // Returns the path to the executable in the temporary directory
 func setup(file: URL, withAdditionalFiles additionalFiles: [URL], searchPaths: [URL]) -> URL {
     let workingDirectoryTemplate = NSTemporaryDirectory() + "/swiftscript-XXX"
-    guard let cstring = mkdtemp(UnsafeMutablePointer(mutating: workingDirectoryTemplate.cString(using: .utf8))) else {
+    guard let cstring = mkdtemp(UnsafeMutablePointer<Int8>(mutating: workingDirectoryTemplate.cString(using: .utf8))) else {
         print("Failed to create temporary directory for compilation: errno \(errno)")
         exit(1)
     }
