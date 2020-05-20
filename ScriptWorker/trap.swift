@@ -12,7 +12,7 @@ enum Signal: Int32 {
   case TERM   = 15
 }
 
-func trap(signal: Signal, action: @convention(c) (Int32) -> ()) {
+func trap(signal: Signal, action: @escaping @convention(c) (Int32) -> ()) {
   // From Swift, sigaction.init() collides with the Darwin.sigaction() function.
   // This local typealias allows us to disambiguate them.
   typealias SignalAction = sigaction

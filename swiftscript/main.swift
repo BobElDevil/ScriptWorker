@@ -38,28 +38,33 @@ func runExec(task: String, args: [String], overrideExecutablePath: String? = nil
 // Returns the path to the executable in the temporary directory
 func setup(file: URL, withAdditionalFiles additionalFiles: [URL], searchPaths: [URL]) -> URL {
     let workingDirectoryTemplate = NSTemporaryDirectory() + "/swiftscript-XXX"
-    guard let cstring = mkdtemp(UnsafeMutablePointer(mutating: workingDirectoryTemplate.cString(using: .utf8))) else {
-        print("Failed to create temporary directory for compilation: errno \(errno)")
-        exit(1)
+
+    print("working dir template = \(workingDirectoryTemplate)")
+
+    return workingDirectoryTemplate.withCString { workingDirCString in
+        guard let cstring = mkdtemp(UnsafeMutablePointer(mutating:workingDirCString)) else {
+            print("Failed to create temporary directory for compilation: errno \(errno)")
+            exit(1)
+        }
+        
+        let workingDirectory = URL(fileURLWithPath: String(cString: cstring))
+
+        let swiftFiles = SwiftScript.swiftURLs(for: additionalFiles)
+
+        let (mainFile, compiledFiles) = SwiftScript.setup(workingDirectory: workingDirectory, for: file, with: swiftFiles)
+
+        let process = Process()
+        process.launchPath = "/usr/bin/xcrun"
+        
+        let executableURL = workingDirectory.appendingPathComponent(file.deletingPathExtension().lastPathComponent)
+        
+        let args = ["swiftc", "-o", executableURL.path] + SwiftScript.swiftArguments(for: mainFile, additionalFiles: compiledFiles, searchPaths: searchPaths)
+        process.arguments = args
+        process.launch()
+        process.waitUntilExit()
+
+        return executableURL
     }
-
-    let workingDirectory = URL(fileURLWithPath: String(cString: cstring))
-
-    let swiftFiles = SwiftScript.swiftURLs(for: additionalFiles)
-
-    let (mainFile, compiledFiles) = SwiftScript.setup(workingDirectory: workingDirectory, for: file, with: swiftFiles)
-
-    let process = Process()
-    process.launchPath = "/usr/bin/xcrun"
-
-    let executableURL = workingDirectory.appendingPathComponent(file.deletingPathExtension().lastPathComponent)
-
-    let args = ["swiftc", "-o", executableURL.path] + SwiftScript.swiftArguments(for: mainFile, additionalFiles: compiledFiles, searchPaths: searchPaths)
-    process.arguments = args
-    process.launch()
-    process.waitUntilExit()
-
-    return executableURL
 }
 
 guard CommandLine.arguments.count >= 2 else {
